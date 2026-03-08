@@ -59,7 +59,7 @@ function renderList() {
                 <div style="display:flex; align-items:center; gap:0.5rem">
                     <span style="font-size: 1.25rem;">📱</span>
                     <div>
-                        <div style="color: var(--text-main); font-weight: 500;">${d.username}</div>
+                        <div style="color: var(--text-main); font-weight: 500;">${d.username} <span style="font-size: 0.75rem; color: #60a5fa;">(${d.thumbType || 'Right Thumb'})</span></div>
                         <div style="color: var(--text-muted); font-size: 0.75rem;">Created: ${new Date(d.date).toLocaleString()}</div>
                     </div>
                 </div>
@@ -70,7 +70,10 @@ function renderList() {
 }
 
 // 1. REGISTRATION
-document.getElementById('register-btn').addEventListener('click', async () => {
+document.getElementById('register-right-btn').addEventListener('click', () => startRegistration('Right Thumb'));
+document.getElementById('register-left-btn').addEventListener('click', () => startRegistration('Left Thumb'));
+
+async function startRegistration(thumbType) {
     const username = document.getElementById('username').value.trim();
     if (!username) return showStatus('Please enter a username first.', true);
 
@@ -84,11 +87,13 @@ document.getElementById('register-btn').addEventListener('click', async () => {
     let successfulScans = 0;
 
     // Disable inputs while scanning
-    const registerBtn = document.getElementById('register-btn');
+    const registerRightBtn = document.getElementById('register-right-btn');
+    const registerLeftBtn = document.getElementById('register-left-btn');
     const authBtn = document.getElementById('authenticate-btn');
     const nameInput = document.getElementById('username');
 
-    registerBtn.disabled = true;
+    registerRightBtn.disabled = true;
+    registerLeftBtn.disabled = true;
     authBtn.disabled = true;
     nameInput.disabled = true;
 
@@ -100,7 +105,7 @@ document.getElementById('register-btn').addEventListener('click', async () => {
         let finalCredential = null;
 
         while (successfulScans < maxAttempts) {
-            showStatus(`Scan ${successfulScans + 1} of ${maxAttempts}: Please scan your fingerprint...`);
+            showStatus(`Enroll ${thumbType} - Scan ${successfulScans + 1} of ${maxAttempts}: Please press your finger...`);
 
             const challenge = new Uint8Array(32);
             window.crypto.getRandomValues(challenge);
@@ -133,7 +138,7 @@ document.getElementById('register-btn').addEventListener('click', async () => {
 
             // Optional: add a tiny delay between prompts so it doesn't instantly jump
             if (successfulScans < maxAttempts) {
-                showStatus(`✅ Scan ${successfulScans} recorded. Lift and place finger again...`);
+                showStatus(`✅ Scan ${successfulScans} recorded. Lift and place ${thumbType} again...`);
                 await new Promise(resolve => setTimeout(resolve, 800));
             }
         }
@@ -142,11 +147,12 @@ document.getElementById('register-btn').addEventListener('click', async () => {
         const credentialIdBase64 = bufferToBase64url(finalCredential.rawId);
         saveDevice({
             username: username,
+            thumbType: thumbType,
             credentialId: credentialIdBase64,
             date: new Date().toISOString()
         });
 
-        showStatus('✨ Fingerprint fully enrolled and registered!');
+        showStatus(`✨ ${thumbType} fully enrolled and registered!`);
         document.getElementById('username').value = '';
 
     } catch (err) {
@@ -154,11 +160,12 @@ document.getElementById('register-btn').addEventListener('click', async () => {
         showStatus(`Registration failed or cancelled on scan ${successfulScans + 1}: ` + err.message, true);
     } finally {
         // Re-enable inputs
-        registerBtn.disabled = false;
+        registerRightBtn.disabled = false;
+        registerLeftBtn.disabled = false;
         authBtn.disabled = false;
         nameInput.disabled = false;
     }
-});
+}
 
 // 2. VERIFICATION (LOGIN)
 document.getElementById('authenticate-btn').addEventListener('click', async () => {

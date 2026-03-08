@@ -26,15 +26,16 @@
                 <input type="text" id="username" placeholder="e.g. resident_001" required>
             </div>
 
-            <button class="btn btn-primary" id="register-btn">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z">
-                    </path>
-                </svg>
-                Register Device Fingerprint
-            </button>
+            <div style="display: flex; gap: 0.75rem;">
+                <button class="btn btn-primary" id="register-right-btn"
+                    style="flex: 1; font-size: 0.85rem; padding: 0.85rem 0.5rem;">
+                    👍 Enroll Right Thumb
+                </button>
+                <button class="btn btn-primary" id="register-left-btn"
+                    style="flex: 1; font-size: 0.85rem; padding: 0.85rem 0.5rem; background: rgba(59, 130, 246, 0.2); border: 1px solid var(--primary);">
+                    👍 Enroll Left Thumb
+                </button>
+            </div>
 
             <button class="btn btn-outline" id="authenticate-btn" style="margin-top: 1rem;">
                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"

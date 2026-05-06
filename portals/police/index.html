@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioID</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Boxicons for icons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo-details">
+            <i class='bx bx-fingerprint'></i>
+            <span class="logo_name">BioID</span>
+        </div>
+        <ul class="nav-links">
+            <li>
+                <a href="#" class="active" data-tab="dashboard">
+                    <i class='bx bx-grid-alt'></i>
+                    <span class="links_name">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" data-tab="reports">
+                    <i class='bx bx-car'></i>
+                    <span class="links_name">Accident Reports</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" data-tab="map">
+                    <i class='bx bx-map-alt'></i>
+                    <span class="links_name">High Risk Zones</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" data-tab="residents">
+                    <i class='bx bx-group'></i>
+                    <span class="links_name">Residents list</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <section class="home-section">
+        <nav>
+            <div class="sidebar-button">
+                <i class='bx bx-menu sidebarBtn'></i>
+                <span class="dashboard">Officer Dashboard</span>
+                <span class="badge-jurisdiction" id="municipalityBadge" style="margin-left: 20px;">Jurisdiction:
+                    loading...</span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <button id="scannerStatusBtn" class="scanner-square offline" title="Scanner Status" style="cursor:pointer;">
+                    <i class='bx bx-fingerprint'></i>
+                </button>
+                <div class="profile-details" id="profileDropdownBtn">
+                <img src="https://ui-avatars.com/api/?name=Officer&background=103155&color=fff" alt="profileImg"
+                    id="profileImg">
+                <span class="admin_name" id="profileName">Officer</span>
+                <i class='bx bx-chevron-down'></i>
+
+                <!-- Profile Menu -->
+                <div class="profile-menu" id="profileMenu">
+                    <a href="#" class="profile-menu-item" id="openSettingsBtn">
+                        <i class='bx bx-user-circle'></i>
+                        <span>User Settings</span>
+                    </a>
+                    <a href="../../index.html" class="profile-menu-item logout-item">
+                        <i class='bx bx-log-out'></i>
+                        <span>Log out</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="home-content">
+            <!-- DASHBOARD TAB -->
+            <div id="dashboardTab" class="tab-content active">
+                <div class="overview-boxes">
+                    <div class="box" style="cursor: pointer;"
+                        onclick="document.querySelector('.nav-links a[data-tab=\'reports\']').click()">
+                        <div class="right-side">
+                            <div class="box-topic">Total Accidents</div>
+                            <div class="number" id="stats-accidents">0</div>
+                            <div class="indicator">
+                                <i class='bx bx-minus'></i>
+                                <span class="text">No incidents recorded</span>
+                            </div>
+                        </div>
+                        <i class='bx bx-car cart'></i>
+                    </div>
+                    <div class="box" style="cursor: pointer;"
+                        onclick="document.querySelector('.nav-links a[data-tab=\'reports\']').click()">
+                        <div class="right-side">
+                            <div class="box-topic">Critical Cases</div>
+                            <div class="number" id="stats-critical">0</div>
+                            <div class="indicator">
+                                <i class='bx bx-minus'></i>
+                                <span class="text">0 pending resolutions</span>
+                            </div>
+                        </div>
+                        <i class='bx bx-error cart'></i>
+                    </div>
+                    <div class="box" style="cursor: pointer;"
+                        onclick="document.querySelector('.nav-links a[data-tab=\'residents\']').click()">
+                        <div class="right-side">
+                            <div class="box-topic">Registered Residents</div>
+                            <div class="number" id="stats-residents">0</div>
+                            <div class="indicator">
+                                <i class='bx bx-group'></i>
+                                <span class="text">Ready for Identification</span>
+                            </div>
+                        </div>
+                        <i class='bx bx-group cart'></i>
+                    </div>
+                </div>
+
+                <div class="analytics-row">
+                    <!-- Municipality Chart -->
+                    <div class="chart-container box-white">
+                        <div class="title">Municipality-wide Accident Breakdown</div>
+                        <div class="chart-content-layout">
+                            <div class="hero-stat">
+                                <div class="stat-circle">
+                                    <span class="main-number" id="stats-accidents-hero">0</span>
+                                    <span class="sub-label">Total Incidents</span>
+                                </div>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="municipalityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Map Container -->
+                    <div class="map-container box-white">
+                        <div class="title">High Risk Areas Map (Jurisdiction: <span id="jurisdictionTitle">...</span>)
+                        </div>
+                        <div id="riskMap"></div>
+                    </div>
+                </div>
+
+                <div class="recent-reports box-white mt-4">
+                    <div class="title">Recent Accident Reports in your Jurisdiction</div>
+                    <div class="table-responsive">
+                        <table class="reports-table">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Victim Name</th>
+                                    <th>Location</th>
+                                    <th>Severity</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboardReportsTableBody">
+                                <!-- Loaded from database -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REPORTS TAB -->
+            <div id="reportsTab" class="tab-content">
+                <div class="box-white">
+                    <div class="title d-flex-between">
+                        <span>Municipal Accident Reports</span>
+                        <button class="btn btn-primary" id="openAddReportBtn">
+                            <i class='bx bx-plus'></i> Add Incident Report
+                        </button>
+                    </div>
+                    <div class="table-responsive mt-4">
+                        <table class="reports-table">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Victim Name</th>
+                                    <th>Barangay / Location</th>
+                                    <th>Severity</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fullReportsTableBody">
+                                <!-- Loaded from database -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAP TAB -->
+            <div id="mapTab" class="tab-content">
+                <div class="box-white" style="height: 700px;">
+                    <div class="title">Jurisdiction Risk Map</div>
+                    <div id="fullRiskMap" style="height: 600px; border-radius: 12px;"></div>
+                </div>
+            </div>
+
+            <!-- RESIDENTS TAB -->
+            <div id="residentsTab" class="tab-content">
+                <div class="box-white">
+                    <div class="title d-flex-between">
+                        <span>Registered Residents in <span class="dynamic-muni">...</span></span>
+                        <div class="d-flex" style="gap: 10px;">
+                            <button class="btn btn-danger" id="wipeHardwareBtn" style="background: #FEE2E2; color: #EF4444; border: 1.5px solid #FEE2E2;">
+                                <i class='bx bx-trash-alt'></i> Wipe Hardware
+                            </button>
+                            <button class="btn btn-primary" id="openAddResidentBtn">
+                                <i class='bx bx-user-plus'></i> Register New Resident
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="reports-table">
+                            <thead>
+                                <tr>
+                                    <th>Full Name</th>
+                                    <th>Contact & Details</th>
+                                    <th>Address</th>
+                                    <th>Verification Status</th>
+                                    <th style="text-align: right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="residentsTableBody">
+                                <tr>
+                                    <td colspan="4" style="text-align: center; padding: 30px; color: #94A3B8;">
+                                        Loading residents database...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Accident Report Modal -->
+    <div id="reportModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header d-flex-between">
+                <h3 class="title" id="reportModalTitle" style="margin-bottom: 0;">Add Incident Report</h3>
+                <i class='bx bx-x' id="closeReportBtn" style="font-size: 24px; cursor: pointer;"></i>
+            </div>
+            <div class="modal-body">
+                <form id="reportForm">
+                    <input type="hidden" id="reportId">
+                    <div class="form-group">
+                        <label>Date & Time</label>
+                        <input type="datetime-local" id="reportDateTime" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Municipality</label>
+                            <select id="reportMunicipality" required>
+                                <option value="" disabled selected>Select Municipality</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Barangay</label>
+                            <select id="reportLocation" required disabled>
+                                <option value="" disabled selected>Select Municipality first</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Severity</label>
+                            <select id="reportSeverity" required>
+                                <option value="Minor">Minor</option>
+                                <option value="Moderate">Moderate</option>
+                                <option value="Severe">Severe</option>
+                                <option value="Critical">Critical</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Current Status</label>
+                            <select id="reportStatus" required>
+                                <option value="Reported">Reported</option>
+                                <option value="Under Investigation">Under Investigation</option>
+                                <option value="Resolved">Resolved</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="biometric-scan-section box-white"
+                        style="background: #F8FAFC; border: 2px dashed #E2E8F0; padding: 20px; margin-bottom: 20px; text-align: center;">
+                        <div id="scannerInitialState">
+                            <button type="button" class="btn btn-primary" id="scanVictimBtn" style="background: #103155;">
+                                <i class='bx bx-fingerprint'></i> Scan Victim Fingerprint
+                            </button>
+                        </div>
+                        <div id="verifiedState" style="display: none; flex-direction: column; align-items: center; gap: 8px; padding: 10px;">
+                            <div style="font-size: 52px; color: #10B981; filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.4)); animation: scannerPulse 2s infinite;">
+                                <i class='bx bx-fingerprint'></i>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 5px; color: #10B981; font-weight: 800; font-size: 13px; letter-spacing: 0.5px;">
+                                <i class='bx bxs-check-shield'></i> BIOMETRICS MATCHED
+                            </div>
+                            <button type="button" id="rescanBtn" style="background: none; border: none; color: #64748B; font-size: 11px; text-decoration: underline; cursor: pointer; margin-top: 5px; opacity: 0.7;">Click here to re-scan</button>
+                        </div>
+                        <div id="victimInfoArea"
+                            style="display: none; margin-top: 15px; text-align: left; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #CBD5E1;">
+                            <div style="font-weight: 700; color: #10B981; font-size: 14px; margin-bottom: 5px;"><i
+                                    class='bx bx-check-circle'></i> Victim Identified</div>
+                            <div style="font-size: 16px; font-weight: 600;" id="victimNameText">...</div>
+                            <div style="font-size: 13px; color: #64748B;" id="victimAddressText">...</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Victim & Incident Details</label>
+                        <textarea id="reportInvolved" class="textarea-auto" rows="4"
+                            placeholder="Identify victim via scan above or enter details manually..."></textarea>
+                    </div>
+
+                    <div class="form-actions mt-4">
+                        <button type="button" class="btn btn-cancel" id="cancelReportBtn">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="saveReportBtn">
+                            Save Incident Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </section>
+
+    <!-- Resident Registration Modal -->
+    <div id="residentModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header d-flex-between">
+                <h3 class="title" style="margin-bottom: 0;">Register New Resident</h3>
+                <i class='bx bx-x' id="closeResidentBtn" style="font-size: 24px; cursor: pointer;"></i>
+            </div>
+            <div class="modal-body">
+                <form id="residentForm">
+                    <h4 class="form-section-title">Personal Details</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" id="resFirstName" placeholder="Enter first name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name</label>
+                            <input type="text" id="resLastName" placeholder="Enter last name" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Barangay</label>
+                            <select id="resBarangay" required>
+                                <option value="" disabled selected>Select Barangay</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Number</label>
+                            <input type="text" id="resContact" placeholder="09xxxxxxxxx">
+                        </div>
+                    </div>
+
+                    <h4 class="form-section-title">Emergency Contact</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="resEmergencyName" placeholder="Enter full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Relationship</label>
+                            <input type="text" id="resEmergencyRelation" placeholder="e.g. Parent, Sibling" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Contact Number</label>
+                            <input type="text" id="resEmergencyContact" placeholder="09xxxxxxxxx" required>
+                        </div>
+                    </div>
+
+                    <h4 class="form-section-title">Medical Information</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Blood Type</label>
+                            <select id="resBloodType" required>
+                                <option value="" disabled selected>Select Blood Type</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                                <option value="Unknown">Unknown</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Remarks</label>
+                            <textarea id="resMedical" class="textarea-auto" placeholder="Enter any medical conditions or remarks..." rows="1"></textarea>
+                        </div>
+                    </div>
+
+                    <h4 class="form-section-title">Biometrics</h4>
+                    <div class="biometric-registration box-white" id="biometricSection"
+                        style="background: #F0F9FF; border: 2px solid #BAE6FD; padding: 25px; text-align: center; margin-bottom: 20px; transition: all 0.3s ease; border-radius: 12px;">
+                        
+                        <!-- STATE 1: INITIAL (WAITING) -->
+                        <div id="resScannerInitialState">
+                            <span style="display: block; font-size: 13px; color: #0369A1; margin-bottom: 12px; font-weight: 500;">
+                                <i class='bx bx-info-circle'></i> To register, please place the resident's finger on the scanner.
+                            </span>
+                            <button type="button" class="btn btn-primary" id="registerFingerprintBtn" style="background: #0369A1; border: none; padding: 10px 20px;">
+                                <i class='bx bx-fingerprint'></i> Capture Biometrics
+                            </button>
+                        </div>
+
+                        <!-- STATE 2: VERIFIED (SUCCESS) -->
+                        <div id="resVerifiedState" style="display: none;">
+                            <div class="success-icon" style="font-size: 48px; color: #10B981; margin-bottom: 10px;">
+                                <i class='bx bxs-check-circle'></i>
+                            </div>
+                            <div class="success-content">
+                                <p style="font-weight: 700; color: #065F46; margin-bottom: 4px;">Biometrics Captured!</p>
+                                <p style="font-size: 13px; color: #059669; margin-bottom: 12px;">Fingerprint ID: <span id="resCapturedFpIdDisplay" style="font-weight: 800;">Pending...</span></p>
+                            </div>
+                            <button type="button" id="resRescanBtn" class="btn-retry" style="background: #EF4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+                                <i class='bx bx-refresh'></i> Retry Scan
+                            </button>
+                        </div>
+
+                        <input type="hidden" id="resFingerprintId">
+                    </div>
+
+                    <h4 class="form-section-title">Account Details</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" id="resUsername" placeholder="Enter username" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <input type="password" id="resPassword" placeholder="Enter password" style="width: 100%; padding-right: 40px;" required>
+                                <i class='bx bx-hide toggle-settings-password' data-target="resPassword" style="position: absolute; right: 15px; cursor: pointer; color: #103155; font-size: 18px;"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions mt-4">
+                        <button type="button" class="btn btn-cancel" id="cancelResidentBtn">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="saveResidentBtn">
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal-overlay">
+        <div class="modal-content profile-modal-box">
+            <div class="modal-header d-flex-between">
+                <h3 class="title" style="margin-bottom: 0;">Account Settings</h3>
+                <i class='bx bx-x' id="closeSettingsBtn" style="font-size: 24px; cursor: pointer;"></i>
+            </div>
+            <div class="modal-body">
+                <form id="settingsForm">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="settingsUsername">
+                    </div>
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" id="settingsFirstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" id="settingsLastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Number</label>
+                        <input type="text" id="settingsContact">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 25px;">
+                        <label style="display: block; font-size: 13px; margin-bottom: 8px;">Password</label>
+                        <div style="position: relative; display: flex; align-items: center;">
+                            <input type="text" id="settingsPassword" class="modal-input" placeholder="Enter password" style="width: 100%; border: 1px solid #e2e8f0; padding: 10px 15px; border-radius: 8px; padding-right: 40px;">
+                            <i class='bx bx-show toggle-settings-password' data-target="settingsPassword" style="position: absolute; right: 15px; cursor: pointer; color: #103155; font-size: 18px;"></i>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary"
+                        style="width: 100%; justify-content: center; background: #103155; color: #fff; padding: 12px; border-radius: 8px; border: none; font-weight: 600; margin-top: 15px; cursor: pointer;">Save
+                        Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Alert Overlay -->
+    <div id="customAlert" class="custom-alert-overlay"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 5000;">
+        <div class="custom-alert-box"
+            style="background: #fff; padding: 30px; border-radius: 16px; text-align: center; max-width: 400px; width: 90%;">
+            <div class="custom-alert-icon" id="customAlertIcon" style="font-size: 48px; margin-bottom: 15px;"></div>
+            <h3 id="customAlertTitle" style="font-weight: 700; margin-bottom: 10px;">Alert</h3>
+            <p id="customAlertMessage" style="color: #64748B; font-size: 14px; margin-bottom: 20px;"></p>
+            <button onclick="closeCustomAlert()"
+                style="background: #103155; color: #fff; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; font-weight: 600;">OK</button>
+        </div>
+    </div>
+
+    <!-- Custom Confirm Overlay -->
+    <div id="customConfirm" class="custom-alert-overlay"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 5001;">
+        <div class="custom-alert-box"
+            style="background: #fff; padding: 30px; border-radius: 16px; text-align: center; max-width: 400px; width: 90%;">
+            <div class="custom-alert-icon" style="font-size: 48px; margin-bottom: 15px; color: #D97706;">
+                <i class='bx bx-help-circle'></i>
+            </div>
+            <h3 id="customConfirmTitle" style="font-weight: 700; margin-bottom: 10px;">Confirm</h3>
+            <p id="customConfirmMessage" style="color: #64748B; font-size: 14px; margin-bottom: 20px;"></p>
+            <div style="display: flex; gap: 10px;">
+                <button id="customConfirmCancel" class="btn btn-cancel" style="flex:1;">Cancel</button>
+                <button id="customConfirmOk"
+                    style="flex:1; background: #EF4444; color: #fff; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600;">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js?v=7"></script>
+
+    <script>
+        function closeCustomAlert() {
+            document.getElementById('customAlert').style.display = 'none';
+        }
+    </script>
+</body>
+
+</html>

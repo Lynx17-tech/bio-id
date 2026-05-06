@@ -2,10 +2,12 @@
   "name": "bioid-biometric-recognition-system-for-vehicular-accident",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "electron .",
+    "server": "node server.js",
+    "build": "electron-builder"
   },
   "repository": {
     "type": "git",
@@ -29,6 +31,32 @@
   "devDependencies": {
     "@capacitor/android": "^8.3.1",
     "@capacitor/cli": "^8.3.1",
-    "@capacitor/core": "^8.3.1"
+    "@capacitor/core": "^8.3.1",
+    "electron": "^42.0.0",
+    "electron-builder": "^26.8.1"
+  },
+  "build": {
+    "appId": "com.bioid.app",
+    "productName": "BioID System",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "icon": "www/images/favicon.png",
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "files": [
+      "www/**/*",
+      "main.js",
+      "server.js",
+      "database/**/*",
+      "package.json"
+    ]
   }
 }

@@ -8,7 +8,7 @@ const app = express();
 const PORT = 4000;
 
 // Database connection
-const dbPath = path.join(__dirname, 'bioid.sqlite');
+const dbPath = path.join(__dirname, 'database', 'bioid.sqlite');
 const db = new sqlite3.Database(dbPath);
 
 // Middleware

@@ -1,0 +1,306 @@
+:root {
+    --resident-primary: #10B981; /* Green for trust/safety */
+    --resident-secondary: #0D9488;
+    --resident-accent: #2563EB; /* Trust Blue */
+    --resident-bg: #F8FAFC;
+    --resident-text: #1E293B;
+    --resident-border: #E2E8F0;
+}
+
+body {
+    background-color: var(--resident-bg);
+}
+
+.resident-sidebar {
+    background: #064E3B !important; /* Deep Green Sidebar */
+}
+
+/* Nav Link Hover & Active for Resident Portal */
+.sidebar .nav-links li a:hover,
+.sidebar .nav-links li a.active {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .nav-links li a.active {
+    background: var(--resident-primary);
+}
+
+.welcome-box {
+    background: #064E3B;
+    color: white;
+    padding: 40px;
+    border-radius: 20px;
+}
+
+.welcome-box h1 {
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.welcome-box p {
+    opacity: 0.9;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.safety-id-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+/* Digital ID Card Style */
+.id-card-visual {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.id-card-visual::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 150px;
+    height: 150px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+.card-header i {
+    font-size: 24px;
+}
+
+.card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.resident-info h2 {
+    font-size: 28px;
+    margin-bottom: 5px;
+}
+
+.resident-info p {
+    opacity: 0.9;
+    font-size: 14px;
+    margin-bottom: 3px;
+}
+
+.status-verified {
+    background: #DCFCE7;
+    color: #166534;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* Quick Status List */
+.status-list {
+    margin-top: 20px;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--resident-border);
+    font-size: 14px;
+}
+
+.status-item:last-child {
+    border-bottom: none;
+}
+
+.btn-emergency {
+    background: #EF4444;
+    color: white;
+    width: 100%;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 12px;
+}
+
+.btn-emergency:hover {
+    background: #DC2626;
+    transform: scale(1.02);
+}
+
+/* Medical Profile Details */
+.medical-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+}
+
+.medical-item label {
+    display: block;
+    color: #64748B;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.medical-item .value {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--resident-text);
+}
+
+.alert-info {
+    background: #EFF6FF;
+    color: var(--resident-accent);
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    border-left: 4px solid var(--resident-accent);
+}
+
+/* Switches & Toggles */
+.switch {
+    display: inline-block;
+    height: 24px;
+    position: relative;
+    width: 44px;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    background-color: #ccc;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    background-color: #fff;
+    bottom: 4px;
+    content: "";
+    height: 16px;
+    left: 4px;
+    position: absolute;
+    transition: .4s;
+    width: 16px;
+    border-radius: 50%;
+}
+
+input:checked+.slider {
+    background-color: var(--resident-primary);
+}
+
+input:checked+.slider:before {
+    transform: translateX(20px);
+}
+
+.toggle-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toggle-text h3 {
+    font-size: 16px;
+}
+
+.toggle-text p {
+    color: #64748B;
+    font-size: 13px;
+}
+
+/* Dynamic Text Utilities */
+.text-danger { color: #EF4444; }
+.badge-success { background: #DCFCE7; color: #166534; }
+.border-top { border-top: 1px solid var(--resident-border); }
+.border-bottom { border-bottom: 1px solid var(--resident-border); }
+.py-3 { padding-top: 15px; padding-bottom: 15px; }
+.mb-3 { margin-bottom: 15px; }
+
+@media (max-width: 1024px) {
+    .safety-id-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .welcome-box {
+        padding: 25px;
+        border-radius: 15px;
+    }
+    .welcome-box h1 {
+        font-size: 24px;
+    }
+    .id-card-visual {
+        min-height: 200px;
+        padding: 20px;
+    }
+    .resident-info h2 {
+        font-size: 20px;
+    }
+    .qr-code i {
+        font-size: 60px !important;
+    }
+    .safety-id-grid {
+        gap: 20px;
+    }
+    .medical-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
+
+.d-none {
+    display: none !important;
+}
+
+.credential-box {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.credential-box:hover {
+    border-color: var(--resident-primary) !important;
+    background: #fff !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+#toggle-view-password:hover {
+    border-color: var(--resident-primary) !important;
+    color: var(--resident-primary);
+    transform: scale(1.05);
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}

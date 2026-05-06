@@ -1,0 +1,34 @@
+{
+  "name": "bioid-biometric-recognition-system-for-vehicular-accident",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BJManalo/BioID-Biometric-Recognition-System.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/BJManalo/BioID-Biometric-Recognition-System/issues"
+  },
+  "homepage": "https://github.com/BJManalo/BioID-Biometric-Recognition-System#readme",
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "cordova-plugin-usbserial": "^0.0.1",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "sqlite3": "^6.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.3.1",
+    "@capacitor/cli": "^8.3.1",
+    "@capacitor/core": "^8.3.1"
+  }
+}

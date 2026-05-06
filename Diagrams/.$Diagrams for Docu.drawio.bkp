@@ -1,0 +1,53 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.3.0 Chrome/140.0.7339.249 Electron/38.7.2 Safari/537.36" version="29.3.0">
+  <diagram name="Page-1" id="dMI9zQFEiR2f8S38Qhz_">
+    <mxGraphModel dx="946" dy="669" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ywYMqmtbyn4vHS0oMdUa-1" edge="1" parent="1" source="ywYMqmtbyn4vHS0oMdUa-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" target="ywYMqmtbyn4vHS0oMdUa-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ywYMqmtbyn4vHS0oMdUa-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Times New Roman;fontStyle=1" value="&lt;ul style=&quot;text-align: left;&quot;&gt;&lt;li&gt;&lt;font face=&quot;Times New Roman&quot;&gt;&lt;span style=&quot;text-indent: -18pt; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); line-height: 18px;&quot;&gt;Fingerprints, personal info, emergency contact&lt;/span&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;line-height: 18px;&quot;&gt;Accident Victim Fingerprint Scan&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;line-height: 18px;&quot;&gt;&lt;span style=&quot;line-height: 12.84px;&quot;&gt;Operational Data&amp;nbsp;&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="460" width="260" x="170" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="ywYMqmtbyn4vHS0oMdUa-3" edge="1" parent="1" source="ywYMqmtbyn4vHS0oMdUa-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.002;entryY=0.513;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;strokeWidth=2;" target="ywYMqmtbyn4vHS0oMdUa-6">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="810" y="560" as="sourcePoint" />
+            <mxPoint x="920" y="560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ywYMqmtbyn4vHS0oMdUa-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Times New Roman;fontStyle=1" value="&lt;p class=&quot;MsoListParagraphCxSpFirst&quot; style=&quot;margin-left:18.0pt;mso-add-space:&amp;lt;br/&amp;gt;auto;text-indent:-18.0pt;line-height:150%;mso-list:l0 level1 lfo1&quot;&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Register&lt;/span&gt;&lt;/div&gt;&lt;span style=&quot;line-height: 150%;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;and validate residents in the system’s database; assign unique fingerprint&lt;/span&gt;&lt;/div&gt;&lt;font&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;templates&lt;/span&gt;&lt;/div&gt;&lt;/font&gt;&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Match&lt;/span&gt;&lt;/div&gt;&lt;span style=&quot;line-height: 150%;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;scanned fingerprint with local or central database; offline verification if no&lt;/span&gt;&lt;/div&gt;&lt;font&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;internet&lt;/span&gt;&lt;/div&gt;&lt;/font&gt;&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Generate&lt;/span&gt;&lt;/div&gt;&lt;span style=&quot;line-height: 150%;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;incident reports; store offline data; synchronize with central database&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="460" width="250" x="540" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="ywYMqmtbyn4vHS0oMdUa-5" edge="1" parent="1" source="ywYMqmtbyn4vHS0oMdUa-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;" target="ywYMqmtbyn4vHS0oMdUa-11">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1030" y="885" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ywYMqmtbyn4vHS0oMdUa-6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Times New Roman;fontStyle=1;align=left;" value="&lt;p class=&quot;MsoListParagraphCxSpFirst&quot; style=&quot;margin-left:18.0pt;mso-add-space:&lt;br/&gt;auto;text-indent:-18.0pt;line-height:115%;mso-list:l0 level1 lfo1&quot;&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;font&gt;&lt;span style=&quot;line-height: 115%;&quot;&gt;Verified resident database; unique fingerprint&lt;br/&gt;templates; accurate personal and contact information&lt;/span&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;text-indent: -18pt; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Identified victim information: name, age, blood&lt;br/&gt;type, emergency contact&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;line-height: 115%;&quot;&gt;&lt;font&gt;Automatic incident reports; verified victim&lt;br/&gt;records; operational summaries&lt;/font&gt;&lt;/span&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;/p&gt;&lt;br/&gt;&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="450" width="240" x="910" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="ywYMqmtbyn4vHS0oMdUa-7" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=13;fontFamily=Times New Roman;fontStyle=1" value="&lt;span&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;Input&lt;/font&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="60" x="270" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="ywYMqmtbyn4vHS0oMdUa-8" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontFamily=Times New Roman;fontStyle=1" value="&lt;span&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;Process&lt;/font&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="60" x="635" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="ywYMqmtbyn4vHS0oMdUa-9" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontFamily=Times New Roman;fontStyle=1" value="&lt;span&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;Output&lt;/font&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="60" x="1000" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="ywYMqmtbyn4vHS0oMdUa-10" edge="1" parent="1" source="ywYMqmtbyn4vHS0oMdUa-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;strokeWidth=2;" target="ywYMqmtbyn4vHS0oMdUa-2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="560" y="875" as="sourcePoint" />
+            <mxPoint x="270" y="790" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ywYMqmtbyn4vHS0oMdUa-11" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;b&gt;&lt;font face=&quot;Times New Roman&quot; style=&quot;font-size: 14px;&quot;&gt;Evaluation ISO 25010&lt;/font&gt;&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="140" x="590" y="870" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -21,13 +21,20 @@
                 <h2>BioID Login</h2>
                 <p>Biometric Recognition System</p>
                 
-                <!-- MOBILE APP PROMPT (Hidden by default) -->
-                <div id="mobileAppPrompt" class="mobile-app-prompt" style="display: none; margin-top: 15px; background: rgba(44, 116, 179, 0.1); padding: 15px; border-radius: 12px; border: 1px solid rgba(44, 116, 179, 0.2);">
-                    <div style="display: flex; justify-content: center;">
-                        <button id="pwaInstallBtn" class="btn-small" style="width: 100%; font-size: 13px; padding: 12px; background: #2C74B3; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
-                            <i class='bx bx-plus-circle'></i> Install BioID to Home Screen
-                        </button>
+                <!-- PREMIUM MOBILE APP PROMPT -->
+                <div id="mobileAppPrompt" class="mobile-app-card" style="display: none; margin-top: 25px; padding: 20px; background: rgba(44, 116, 179, 0.05); border: 1px solid rgba(44, 116, 179, 0.15); border-radius: 20px; text-align: left;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <div style="width: 50px; height: 50px; background: #2C74B3; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 16px rgba(44, 116, 179, 0.2);">
+                            <i class='bx bx-fingerprint' style="font-size: 30px; color: white;"></i>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: #06182C;">BioID Mobile</h4>
+                            <p style="margin: 0; font-size: 11px; color: #64748B;">Install for a better experience</p>
+                        </div>
                     </div>
+                    <button id="pwaInstallBtn" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #2C74B3 0%, #103155 100%); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(44, 116, 179, 0.3);">
+                        <i class='bx bx-download'></i> Install Now
+                    </button>
                 </div>
                 <p>Welcome back. Please enter your credentials.</p>
             </div>

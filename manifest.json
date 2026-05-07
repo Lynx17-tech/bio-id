@@ -1,0 +1,21 @@
+{
+  "name": "BioID Biometric System",
+  "short_name": "BioID",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#06182C",
+  "theme_color": "#2C74B3",
+  "description": "Biometric Recognition System for Vehicular Accident",
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

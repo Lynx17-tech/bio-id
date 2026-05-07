@@ -95,28 +95,40 @@
         const installBtn = document.getElementById('pwaInstallBtn');
         const mobilePrompt = document.getElementById('mobileAppPrompt');
 
-        // Only show if it's a mobile device
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-            mobilePrompt.style.display = 'block';
-        }
-
+        // Wait for the browser to be ready for installation
         window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the default browser bar from showing
             e.preventDefault();
+            // Save the event so it can be triggered later
             deferredPrompt = e;
-            installBtn.style.display = 'block';
+            // Now that we are ready, show the premium install card
+            if (mobilePrompt) {
+                mobilePrompt.style.display = 'block';
+            }
         });
 
-        installBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    console.log('User accepted the install prompt');
+        if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    // Show the native install prompt
+                    deferredPrompt.prompt();
+                    // Wait for the user to respond to the prompt
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        console.log('User accepted the BioID install');
+                        mobilePrompt.style.display = 'none';
+                    }
+                    deferredPrompt = null;
                 }
-                deferredPrompt = null;
-            } else {
-                alert('To install: Tap the browser menu (three dots or share icon) and select "Add to Home Screen".');
+            });
+        }
+
+        // Hide prompt if app is already installed
+        window.addEventListener('appinstalled', (evt) => {
+            if (mobilePrompt) {
+                mobilePrompt.style.display = 'none';
             }
+            console.log('BioID was installed');
         });
     </script>
 </body>

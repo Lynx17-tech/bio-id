@@ -14,8 +14,10 @@ function createWindow() {
     }
   });
 
-  // Load the index.html from your www folder
-  win.loadFile('index.html');
+  win.webContents.session.clearCache().then(() => {
+    // Load the index.html from your www folder
+    win.loadFile('index.html');
+  });
   
   // Optional: Maximize on start
   win.maximize();

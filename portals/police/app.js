@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. SUPABASE INITIALIZATION
-    const supabaseUrl = 'https://rbncteviieusldynswny.supabase.co';
-    const supabaseKey = 'sb_publishable_7CR3OUMv3lrkGVIfzHko1g_Dpu-yrF0';
+    const supabaseUrl = 'https://tzsglayusbbaajvsohtn.supabase.co';
+    const supabaseKey = 'sb_publishable_fKtzX1kqT-2Qfi2j_aQoUQ_8dZFCmIa';
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     // 2. CHECK SESSION

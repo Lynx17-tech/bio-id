@@ -471,8 +471,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td>${date}</td>
                 <td><div style="font-weight:600; color:#1e293b;">${victimName}</div></td>
                 <td>${r.location}</td>
-                <td><span class="badge ${sevBadge}">${r.severity}</span></td>
-                <td><span class="badge badge-pending">${r.status}</span></td>
+                <td>${r.severity}</td>
+                <td>${r.status}</td>
                 <td>
                     <button class="btn-action btn-edit" title="Edit"><i class='bx bx-edit-alt'></i></button>
                     ${isFull ? `<button class="btn-action btn-delete" title="Delete"><i class='bx bx-trash'></i></button>` : ''}

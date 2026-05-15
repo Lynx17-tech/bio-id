@@ -1,7 +1,8 @@
 {
   "name": "BioID System",
   "short_name": "BioID",
-  "start_url": "index.html",
+  "start_url": ".",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#06182C",
   "theme_color": "#2C74B3",

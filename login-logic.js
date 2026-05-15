@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // SUPABASE INITIALIZATION
-    const supabaseUrl = 'https://rbncteviieusldynswny.supabase.co';
-    const supabaseKey = 'sb_publishable_7CR3OUMv3lrkGVIfzHko1g_Dpu-yrF0';
+    const supabaseUrl = 'https://tzsglayusbbaajvsohtn.supabase.co';
+    const supabaseKey = 'sb_publishable_fKtzX1kqT-2Qfi2j_aQoUQ_8dZFCmIa';
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     const loginForm = document.getElementById('loginForm');
@@ -55,32 +55,59 @@ document.addEventListener('DOMContentLoaded', () => {
             loginBtn.disabled = true;
 
             try {
-                // Dynamically determine the API URL based on the current origin
-                // This supports localhost, local network IP, and Localtunnel automatically
-                const apiBase = window.location.origin;
-                const apiUrl = `${apiBase}/api/auth/login`;
+                let userData = null;
+                let userRole = null;
 
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
+                // 1. Check system_users (Admin / PDRRMO / MDRRMO)
+                const { data: adminUser, error: adminErr } = await supabase
+                    .from('system_users')
+                    .select('*')
+                    .ilike('username', username)
+                    .eq('temp_password', password)
+                    .maybeSingle();
 
-                const result = await response.json();
+                if (adminUser) {
+                    userData = adminUser;
+                    userRole = adminUser.role;
+                } else {
+                    // 2. Check police_accounts
+                    const { data: policeUser, error: policeErr } = await supabase
+                        .from('police_accounts')
+                        .select('*')
+                        .ilike('username', username)
+                        .eq('temporary_password', password)
+                        .maybeSingle();
 
-                if (response.ok) {
-                    const userData = result.user;
-                    userData.role = result.role; // Ensure role is preserved
-                    
+                    if (policeUser) {
+                        userData = policeUser;
+                        userRole = 'POLICE';
+                    } else {
+                        // 3. Check residents
+                        const { data: residentUser, error: resErr } = await supabase
+                            .from('residents')
+                            .select('*')
+                            .ilike('username', username)
+                            .eq('password', password)
+                            .maybeSingle();
+
+                        if (residentUser) {
+                            userData = residentUser;
+                            userRole = 'RESIDENT';
+                        }
+                    }
+                }
+
+                if (userData) {
+                    userData.role = userRole; // Ensure role is preserved
                     sessionStorage.setItem('activeUserData', JSON.stringify(userData));
                     
-                    if (userData.role === 'PDRRMO') {
+                    if (userRole === 'PDRRMO') {
                         window.location.href = 'portals/pdrrmo/index.html';
-                    } else if (userData.role === 'MDRRMO') {
+                    } else if (userRole === 'MDRRMO') {
                         window.location.href = 'portals/mdrrmo/index.html';
-                    } else if (userData.role === 'POLICE') {
+                    } else if (userRole === 'POLICE') {
                         window.location.href = 'portals/police/index.html';
-                    } else if (userData.role === 'RESIDENT') {
+                    } else if (userRole === 'RESIDENT') {
                         window.location.href = 'portals/resident/index.html';
                     }
                     return;
@@ -95,13 +122,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     usernameInput.style.boxShadow = 'none';
                 }, 2000);
 
-                showCustomAlert(result.error || 'Invalid account credentials.', 'error', 'Login Failed');
+                showCustomAlert('Invalid account credentials.', 'error', 'Login Failed');
                 loginBtn.innerHTML = originalBtnText;
                 loginBtn.disabled = false;
 
             } catch (err) {
                 console.error(err);
-                showCustomAlert("Local Server Connection Error. Please ensure the backend is running by executing 'npm run server' in your terminal.", 'error', 'Connection Error');
+                showCustomAlert("Database Connection Error. Please check your internet connection.", 'error', 'Connection Error');
                 loginBtn.innerHTML = originalBtnText;
                 loginBtn.disabled = false;
             }

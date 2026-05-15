@@ -201,17 +201,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     saveBtn.disabled = true;
 
                     try {
-                        const response = await fetch(`${API_URL}/admin/system-users/${activeUser.id}`, {
-                            method: 'PUT',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(updates)
-                        });
+                        const { data, error } = await supabase
+                            .from('system_users')
+                            .update(updates)
+                            .eq('id', activeUser.id)
+                            .select();
 
-                        const result = await response.json();
                         saveBtn.textContent = 'Save Changes';
                         saveBtn.disabled = false;
 
-                        if (!response.ok) throw new Error(result.error || 'Failed to update');
+                        if (error) throw new Error(error.message || 'Failed to update');
 
                         // Refresh session data with the new values
                         const updatedUser = { ...activeUser, ...updates };
@@ -267,11 +266,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!policeTableBody) return;
 
         try {
-            const apiUrl = `${API_URL}/police-accounts?jurisdiction=${encodeURIComponent(activeMunicipality)}`;
-            const response = await fetch(apiUrl);
-            const data = await response.json();
+            const { data, error } = await supabase
+                .from('police_accounts')
+                .select('*')
+                .eq('jurisdiction', activeMunicipality);
 
-            if (!response.ok) throw new Error(data.error || 'Failed to fetch');
+            if (error) throw error;
 
             policeTableBody.innerHTML = ''; // Clear loading/existing
 
@@ -438,21 +438,19 @@ document.addEventListener('DOMContentLoaded', () => {
             saveAccountBtn.textContent = 'Saving...';
             saveAccountBtn.disabled = true;
 
-            const response = await fetch(`${API_URL}/police-accounts`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
+            const { data, error } = await supabase
+                .from('police_accounts')
+                .insert([{
                     username: username,
                     first_name: firstName,
                     last_name: lastName,
                     contact_number: contact,
                     jurisdiction: activeMunicipality,
                     temporary_password: tempPassword
-                })
-            });
+                }])
+                .select();
 
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.error || 'Failed to save');
+            if (error) throw error;
 
             showCustomAlert(`Account created successfully for ${firstName} ${lastName}.`, 'success', 'Account Registered');
 
@@ -520,11 +518,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 "Delete Account",
                 async () => {
                     try {
-                        const response = await fetch(`${API_URL}/police-accounts/${accountId}`, {
-                            method: 'DELETE'
-                        });
+                        const { error } = await supabase
+                            .from('police_accounts')
+                            .delete()
+                            .eq('id', accountId);
 
-                        if (!response.ok) throw new Error('Delete failed');
+                        if (error) throw new Error('Delete failed');
 
                         // Fade out animation before removing
                         row.style.transition = 'opacity 0.3s ease';
@@ -585,21 +584,18 @@ document.addEventListener('DOMContentLoaded', () => {
             saveBtn.disabled = true;
 
             try {
-                const response = await fetch(`${API_URL}/police-accounts/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
+                const { data, error } = await supabase
+                    .from('police_accounts')
+                    .update({
                         username: username,
                         first_name: first,
                         last_name: last,
                         contact_number: contact
                     })
-                });
+                    .eq('id', id)
+                    .select();
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Update failed');
-                }
+                if (error) throw new Error(error.message || 'Update failed');
 
                 showCustomAlert("Police account updated successfully.", 'success', 'Done');
                 editAccountModal.style.display = 'none';

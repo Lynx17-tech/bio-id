@@ -1,5 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // API CONFIGURATION
+    // SUPABASE INITIALIZATION
+    const supabaseUrl = 'https://tzsglayusbbaajvsohtn.supabase.co';
+    const supabaseKey = 'sb_publishable_fKtzX1kqT-2Qfi2j_aQoUQ_8dZFCmIa';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
     const API_URL = `${window.location.origin}/api`;
 
     // --- MUNICIPALITY COLOR CONFIGURATION ---
@@ -116,19 +120,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveBtn.disabled = true;
 
                 try {
-                    const response = await fetch(`${API_URL}/admin/system-users/${activeUser.id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(updates)
-                    });
+                    const { data, error } = await supabase
+                        .from('system_users')
+                        .update(updates)
+                        .eq('id', activeUser.id)
+                        .select();
 
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.error || 'Update failed');
-                    }
+                    if (error) throw new Error(error.message || 'Update failed');
 
-                    const updatedUser = await response.json();
                     alert('✅ Account details updated successfully! Your changes will reflect immediately.');
+                    const updatedUser = { ...activeUser, ...updates };
                     sessionStorage.setItem('activeUserData', JSON.stringify(updatedUser));
                     settingsModal.style.display = 'none';
                 } catch (error) {
@@ -310,10 +311,12 @@ document.addEventListener('DOMContentLoaded', () => {
 // 3. FETCH ADMINS ON LOAD
     const fetchAdmins = async () => {
         try {
-            const response = await fetch(`${API_URL}/admin/system-users?role=MDRRMO`);
-            const data = await response.json();
+            const { data, error } = await supabase
+                .from('system_users')
+                .select('*')
+                .eq('role', 'MDRRMO');
 
-            if (!response.ok) throw new Error(data.error || 'Failed to fetch');
+            if (error) throw error;
 
             // Clear current rows except empty state
             mdrrmoTableBody.querySelectorAll('tr:not(#emptyAdminRow)').forEach(e => e.remove());
@@ -469,18 +472,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (editingRow) {
             const adminId = editingRow.querySelector('.btn-edit').getAttribute('data-id');
             try {
-                const response = await fetch(`${API_URL}/admin/system-users/${adminId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
+                const { data, error } = await supabase
+                    .from('system_users')
+                    .update({
                         username: username,
                         first_name: firstName,
                         last_name: lastName,
                         contact_number: contact
                     })
-                });
+                    .eq('id', adminId)
+                    .select();
 
-                if (!response.ok) throw new Error("Update failed");
+                if (error) throw error;
 
                 await fetchAdmins();
                 alert(`✅ Account updated successfully.`);
@@ -494,10 +497,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // DATABASE INSERT - Use Local API
             try {
-                const response = await fetch(`${API_URL}/auth/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
+                const { data, error } = await supabase
+                    .from('system_users')
+                    .insert([{
                         username: username,
                         role: role,
                         first_name: firstName,
@@ -506,19 +508,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         contact_number: contact,
                         temp_password: tempPassword,
                         status: 'Active'
-                    })
-                });
+                    }])
+                    .select();
 
-                const responseText = await response.text();
-                let result;
-                try {
-                    result = JSON.parse(responseText);
-                } catch (e) {
-                    console.error('SERVER RETURNED HTML INSTEAD OF JSON:', responseText);
-                    throw new Error(`Server Error: Received HTML instead of JSON. Ensure you are visiting through http://localhost:3000 and the server is running.`);
-                }
-
-                if (!response.ok) throw new Error(result.error || 'Failed to create account');
+                if (error) throw error;
 
                 // Sync UI fully with Database
                 await fetchAdmins();
@@ -568,8 +561,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.innerHTML = "<i class='bx bx-loader bx-spin'></i>";
 
                     try {
-                        const response = await fetch(`${API_URL}/admin/system-users/${adminId}`, { method: 'DELETE' });
-                        if (!response.ok) throw new Error("Delete failed");
+                        const { error } = await supabase
+                            .from('system_users')
+                            .delete()
+                            .eq('id', adminId);
+
+                        if (error) throw error;
                         
                         // Apply a quick fade out animation before deleting visually
                         row.style.transition = 'opacity 0.3s ease';
@@ -878,10 +875,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fetchAndRenderReports = async () => {
         try {
-            const response = await fetch(`${API_URL}/reports`);
-            const reports = await response.json();
+            const { data: reports, error } = await supabase
+                .from('accident_reports')
+                .select('*')
+                .order('datetime', { ascending: false });
             
-            if (!response.ok) throw new Error("Failed to load reports");
+            if (error) throw error;
 
             allAccidentReports = reports;
             applyFilters();
@@ -1215,10 +1214,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fetchResidents = async () => {
         try {
-            const response = await fetch(`${API_URL}/residents`);
-            const data = await response.json();
+            const { data, error } = await supabase
+                .from('residents')
+                .select('*');
 
-            if (!response.ok) throw new Error("Failed to load residents");
+            if (error) throw error;
 
             const residentsTableBody = document.getElementById('residentsTableBody');
             const residentsCountEl = document.getElementById('stats-residents');
@@ -1276,10 +1276,12 @@ document.addEventListener('DOMContentLoaded', () => {
         residentsMuniFilter.addEventListener('change', async (e) => {
             const muni = e.target.value;
             try {
-                const url = muni ? `${API_URL}/residents?municipality=${encodeURIComponent(muni)}` : `${API_URL}/residents`;
-                const response = await fetch(url);
-                const data = await response.json();
-                if (response.ok) renderResidents(data);
+                let query = supabase.from('residents').select('*');
+                if (muni) {
+                    query = query.eq('municipality', muni);
+                }
+                const { data, error } = await query;
+                if (!error) renderResidents(data);
             } catch (err) {
                 console.error("Filter error", err);
             }

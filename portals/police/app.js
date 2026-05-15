@@ -182,14 +182,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
 
         try {
-            const response = await fetch(`${API_URL}/police-accounts/${activeUserData.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updateData)
-            });
-            
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.error || "Update failed");
+            const { data, error } = await supabase
+                .from('police_accounts')
+                .update(updateData)
+                .eq('id', activeUserData.id)
+                .select();
+
+            if (error) throw new Error(error.message || "Update failed");
 
             // Update session storage
             const updatedUser = { ...activeUserData, ...updateData };
@@ -380,17 +379,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
 
         try {
-            const method = id ? 'PUT' : 'POST';
-            const url = id ? `${API_URL}/reports/${id}` : `${API_URL}/reports`;
-
-            const response = await fetch(url, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(reportData)
-            });
-
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.error || "Failed to save report");
+            let result;
+            if (id) {
+                const { data, error } = await supabase
+                    .from('accident_reports')
+                    .update(reportData)
+                    .eq('id', id)
+                    .select();
+                if (error) throw error;
+                result = data[0];
+            } else {
+                const { data, error } = await supabase
+                    .from('accident_reports')
+                    .insert([reportData])
+                    .select();
+                if (error) throw error;
+                result = data[0];
+            }
 
             showCustomAlert("Successfully!", "success", "Incident Reported Successfully");
             reportModal.classList.remove('show');
@@ -407,8 +412,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             "Delete Report",
             async () => {
                 try {
-                    const response = await fetch(`${API_URL}/reports/${id}`, { method: 'DELETE' });
-                    if (!response.ok) throw new Error("Delete failed");
+                    const { error } = await supabase
+                        .from('accident_reports')
+                        .delete()
+                        .eq('id', id);
+                    if (error) throw error;
                     showCustomAlert("Report deleted.", "success", "Deleted");
                     await fetchAndRenderAll();
                 } catch (err) {
@@ -421,10 +429,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const fetchAndRenderAll = async () => {
         try {
-            const response = await fetch(`${API_URL}/reports?jurisdiction=${encodeURIComponent(assignedJurisdiction)}`);
-            const reports = await response.json();
+            const { data: reports, error } = await supabase
+                .from('accident_reports')
+                .select('*')
+                .eq('jurisdiction', assignedJurisdiction)
+                .order('datetime', { ascending: false });
 
-            if (!response.ok) throw new Error("Fetch failed");
+            if (error) throw error;
 
             renderReports(reports);
             updateStatsAndCharts(reports);
@@ -1004,8 +1015,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            const response = await fetch(`${API_URL}/residents?fingerprint_id=${hardwareId}`);
-            const residents = await response.json();
+            const { data: residents, error } = await supabase
+                .from('residents')
+                .select('*')
+                .eq('fingerprint_id', hardwareId);
+
+            if (error) throw error;
 
             if (residents.length === 0) {
                 showCustomAlert(`Scanner recognized ID ${hardwareId}, but this person is not in our system yet.`, "error", "Unknown Fingerprint");
@@ -1143,13 +1158,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
 
             try {
-                const response = await fetch(`${API_URL}/residents`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(resData)
-                });
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.error || "Failed to register resident");
+                const { data, error } = await supabase
+                    .from('residents')
+                    .insert([resData])
+                    .select();
+
+                if (error) throw error;
 
                 showCustomAlert("Resident registered successfully!", "success", "Registration Complete");
                 residentModal.classList.remove('show');
@@ -1180,11 +1194,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
 
                     // 2. DATABASE DELETE
-                    const response = await fetch(`${API_URL}/residents/${res.id}`, { method: 'DELETE' });
-                    if (!response.ok) {
-                        const errorData = await response.json().catch(() => ({}));
-                        throw new Error(errorData.error || `Delete failed (Status: ${response.status})`);
-                    }
+                    const { error } = await supabase
+                        .from('residents')
+                        .delete()
+                        .eq('id', res.id);
+
+                    if (error) throw error;
                     
                     showCustomAlert("Resident record and fingerprint cleared successfully.", "success", "Full Cleanup");
                     await loadResidents();
@@ -1212,10 +1227,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                             logToTerminal("COMMAND SENT: FACTORY WIPE ALL HARDWARE BIOMETRICS", "ERROR");
                             
                             // 2. DATABASE WIPE (Sync)
-                            const dbResp = await fetch(`${API_URL}/residents/wipe-all`, { method: 'POST' });
-                            if (dbResp.ok) {
-                                logToTerminal("DATABASE WIPE: All resident records deleted from SQLITE", "SUCCESS");
-                            }
+                            const { error: dbError } = await supabase
+                                .from('residents')
+                                .delete()
+                                .neq('id', -1); // Delete all
+                            
+                            if (dbError) throw dbError;
+                            logToTerminal("DATABASE WIPE: All resident records deleted from Supabase", "SUCCESS");
 
                             showCustomAlert("Wipe command sent. Hardware cleared and Database emptied.", "success", "Full System Reset");
                             await loadResidents();
@@ -1234,8 +1252,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const loadResidents = async () => {
         if (!residentsTableBody) return;
         try {
-            const response = await fetch(`${API_URL}/residents?municipality=${encodeURIComponent(assignedJurisdiction)}`);
-            const residents = await response.json();
+            const { data: residents, error } = await supabase
+                .from('residents')
+                .select('*')
+                .eq('municipality', assignedJurisdiction);
+
+            if (error) throw error;
 
             residentsTableBody.innerHTML = '';
             if (residents.length === 0) {

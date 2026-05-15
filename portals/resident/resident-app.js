@@ -267,20 +267,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const apiUrl = `${API_URL}/residents/update-account`;
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    id: resident.id, 
+            const { data, error } = await supabase
+                .from('residents')
+                .update({ 
                     username: newUsername, 
                     password: newPassword 
                 })
-            });
+                .eq('id', resident.id)
+                .select();
 
-            const result = await response.json();
-
-            if (response.ok) {
+            if (!error) {
                 // Update local storage
                 resident.username = newUsername;
                 resident.password = newPassword;
@@ -294,11 +290,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 cancelBtn.onclick();
                 alert("Credentials updated successfully!");
             } else {
-                alert(result.error || "Failed to update credentials.");
+                alert(error.message || "Failed to update credentials.");
             }
         } catch (err) {
             console.error("Save error:", err);
-            alert("Connection error. Is the server running?");
+            alert("Connection error or Supabase misconfiguration.");
         } finally {
             saveBtn.disabled = false;
             saveBtn.innerHTML = "Save Changes";

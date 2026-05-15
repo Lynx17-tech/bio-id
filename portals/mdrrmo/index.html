@@ -23,7 +23,7 @@
     <div class="sidebar mdrrmo-sidebar">
         <div class="logo-details">
             <i class='bx bx-fingerprint'></i>
-            <span class="logo_name">BioID MDRRMO</span>
+            <span class="logo_name">BioID</span>
         </div>
         <ul class="nav-links">
             <li>
@@ -185,21 +185,7 @@
                             </div>
                         </div>
 
-                        <!-- Quick Actions -->
-                        <div class="box-glass">
-                            <div class="title">Quick Actions</div>
-                            <div style="display: flex; flex-direction: column; gap: 10px;">
-                                <button class="btn btn-primary" onclick="window.print()"
-                                    style="width: 100%; display: flex; justify-content: center; gap: 10px;">
-                                    <i class='bx bx-file-blank'></i> Generate Monthly PDF
-                                </button>
-                                <button class="btn btn-warning"
-                                    onclick="alert('Feature locked. Requires Messaging API configuration.')"
-                                    style="width: 100%; display: flex; justify-content: center; gap: 10px;">
-                                    <i class='bx bx-broadcast'></i> Broadcast Alert
-                                </button>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
 
@@ -241,22 +227,20 @@
             <div id="reportsTab" class="tab-content" style="display: none;">
                 <div class="recent-reports box-glass mt-4">
                     <div class="print-header" style="display: none;">
-                        <img src="" class="print-muni-logo" style="height: 100px; width: 100px; object-fit: contain;">
+
                         <div style="flex: 1;">
                             <h2 style="margin: 0; font-size: 24px;">Municipality of <span class="dynamic-muni-text text-uppercase">Barbaza</span></h2>
                             <h3 style="margin: 5px 0; color: #64748B;">MDRRMO Accident Record Summary</h3>
                         </div>
                     </div>
                     <div class="title d-flex-between">
-                        <span>Municipal Accident Reports (<span class="dynamic-muni-text">Barbaza</span>)</span>
-                        <div class="filter-actions" style="display: flex; gap: 10px;">
-                            <input type="month" id="recordsMonthFilter" class="modern-select" style="width: auto;">
-                            <!-- Locked to the MDRRMO's assigned municipality -->
-                            <input type="text" id="recordsMunicipalityFilter" class="modern-select" value="Barbaza"
-                                readonly
-                                style="width: auto; background-color: #f5f5f5; color: #666; cursor: not-allowed;">
-                            <button class="btn btn-primary" onclick="window.print()"><i class='bx bx-printer'></i> Print
-                                Report</button>
+                        <span><span class="dynamic-muni-text">Barbaza</span></span>
+                        <div class="filter-actions" style="display: flex; gap: 8px; align-items: center;">
+                            <input type="month" id="recordsMonthFilter" class="modern-select mini-filter">
+                            <span id="recordsMunicipalityLabel" class="jurisdiction-label dynamic-muni-text">Barbaza</span>
+                            <button class="btn btn-primary btn-sm btn-print-mobile" onclick="window.print()">
+                                <i class='bx bx-printer'></i> <span class="hide-on-mobile">Print Report</span>
+                            </button>
                         </div>
                     </div>
 
@@ -333,9 +317,10 @@
                 <!-- Account Creation Form for Police -->
                 <div class="create-account-section box-glass">
                     <div class="title d-flex-between">
-                        <span>Create Police Account for <span class="dynamic-muni-text">Barbaza</span></span>
-                        <button class="btn btn-primary" id="toggleFormBtn"><i class='bx bx-plus'></i> New Police
-                            Account</button>
+                        <span>Police Account <span class="hide-on-mobile">for <span class="dynamic-muni-text">Barbaza</span></span></span>
+                        <button class="btn btn-primary btn-icon-mobile" id="toggleFormBtn">
+                            <i class='bx bx-plus'></i> <span class="hide-on-mobile">New Police Account</span>
+                        </button>
                     </div>
 
                     <div class="account-form-container" id="accountForm">

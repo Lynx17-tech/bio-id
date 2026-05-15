@@ -151,26 +151,7 @@
                     </div>
                 </div>
 
-                <div class="recent-reports box-white mt-4">
-                    <div class="title">Recent Accident Reports in your Jurisdiction</div>
-                    <div class="table-responsive">
-                        <table class="reports-table">
-                            <thead>
-                                <tr>
-                                    <th>Date & Time</th>
-                                    <th>Victim Name</th>
-                                    <th>Location</th>
-                                    <th>Severity</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dashboardReportsTableBody">
-                                <!-- Loaded from database -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+
             </div>
 
             <!-- REPORTS TAB -->
@@ -214,13 +195,13 @@
             <div id="residentsTab" class="tab-content">
                 <div class="box-white">
                     <div class="title d-flex-between">
-                        <span>Registered Residents in <span class="dynamic-muni">...</span></span>
+                        <span>Residents in <span class="dynamic-muni">...</span></span>
                         <div class="d-flex" style="gap: 10px;">
                             <button class="btn btn-danger" id="wipeHardwareBtn" style="background: #FEE2E2; color: #EF4444; border: 1.5px solid #FEE2E2;">
-                                <i class='bx bx-trash-alt'></i> Wipe Hardware
+                                <i class='bx bx-trash-alt'></i> <span class="mobile-hide-text">Wipe Hardware</span>
                             </button>
                             <button class="btn btn-primary" id="openAddResidentBtn">
-                                <i class='bx bx-user-plus'></i> Register New Resident
+                                <i class='bx bx-user-plus'></i> <span class="mobile-hide-text">Register New Resident</span>
                             </button>
                         </div>
                     </div>

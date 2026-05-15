@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // API CONFIGURATION
-    const API_URL = 'http://localhost:4000/api';
+    const API_URL = `${window.location.origin}/api`;
 
     // --- MUNICIPALITY COLOR CONFIGURATION ---
     const municipalities = [
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             sessionStorage.removeItem('activeUserData');
-            window.location.href = '../index.html';
+            window.location.href = '../../index.html';
         });
     }
 
@@ -249,6 +249,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Fix Leaflet map rendering glitch when switching tabs
             if (btn.dataset.tab === 'dashboard' && typeof map !== 'undefined') {
                 setTimeout(() => map.invalidateSize(), 50);
+            }
+
+            // Mobile Sidebar Auto-close
+            if (window.innerWidth <= 768 && sidebar.classList.contains("active")) {
+                sidebar.classList.remove("active");
+                if (sidebarBtn) sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
             }
         });
     });
@@ -488,7 +494,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // DATABASE INSERT - Use Local API
             try {
-                const response = await fetch('http://localhost:4000/api/auth/register', {
+                const response = await fetch(`${API_URL}/auth/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -961,7 +967,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             reportsTableBody.insertAdjacentHTML('beforeend', rowHTML);
 
-            if (r.status !== 'Resolved') {
+            const fiveDaysAgo = new Date();
+            fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+            const reportDate = new Date(r.datetime);
+
+            if (r.status !== 'Resolved' && reportDate >= fiveDaysAgo) {
                 activeCasesTableBody.insertAdjacentHTML('beforeend', rowHTML);
             }
         });
@@ -979,7 +989,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (totalAccidentsEl) totalAccidentsEl.textContent = reports.length;
 
-        const activeCount = reports.filter(r => r.status !== 'Resolved').length;
+        const fiveDaysAgo = new Date();
+        fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+
+        const activeCount = reports.filter(r => {
+            const reportDate = new Date(r.datetime);
+            return r.status !== 'Resolved' && reportDate >= fiveDaysAgo;
+        }).length;
+
         if (activeCasesEl) activeCasesEl.textContent = activeCount;
 
         // Update indicators

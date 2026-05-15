@@ -7,11 +7,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 2. CHECK SESSION
     const activeUserData = JSON.parse(sessionStorage.getItem('activeUserData'));
     if (!activeUserData || activeUserData.role !== 'POLICE') {
-        window.location.href = '../index.html';
+        window.location.href = '../../index.html';
         return;
     }
 
-    const API_URL = 'http://localhost:4000/api';
+    const API_URL = `${window.location.origin}/api`;
 
     // --- MOBILE HARDWARE SUPPORT ---
     const BiometricService = {
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Terminal Logging Helper
     async function logToTerminal(message, level = 'INFO') {
         try {
-            await fetch('http://localhost:4000/api/log', {
+            await fetch(`${API_URL}/log`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message, level })
@@ -514,14 +514,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (labels.length > 0) {
             muniChart.data.labels = labels;
             muniChart.data.datasets[0].data = data;
-            muniChart.data.datasets[0].label = 'Total Accidents';
-            muniChart.data.datasets[0].backgroundColor = 'rgba(44, 116, 179, 0.1)';
-            muniChart.data.datasets[0].borderColor = '#2C74B3';
-            muniChart.data.datasets[0].borderWidth = 3;
-            muniChart.data.datasets[0].pointBackgroundColor = '#2C74B3';
-            muniChart.data.datasets[0].fill = true;
-            muniChart.data.datasets[0].tension = 0.4;
-            muniChart.update();
+            
+            // Ensure no rotation or wiggling on mobile
+            muniChart.options.scales.x.ticks.maxRotation = 0;
+            muniChart.options.scales.x.ticks.minRotation = 0;
+            
+            muniChart.update('none'); // 'none' forces a silent, instant update with 0 animation
         }
     };
 
@@ -623,11 +621,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             fullMarkerLayer.addTo(fullMap);
         }
 
-        // Fetch precise boundary
+        // Fetch precise boundary once
+        let initialBoundsSet = false;
         fetch(`https://nominatim.openstreetmap.org/search.php?q=${assignedJurisdiction},+Antique,+Philippines&polygon_geojson=1&format=jsonv2`)
             .then(res => res.json())
             .then(data => {
-                if (data && data.length > 0 && data[0].geojson) {
+                if (data && data.length > 0 && data[0].geojson && !initialBoundsSet) {
                     const style = { opacity: 0, fillOpacity: 0 };
                     if (map) {
                         const geoLayer1 = L.geoJSON(data[0].geojson, { style }).addTo(map);
@@ -637,6 +636,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         const geoLayer2 = L.geoJSON(data[0].geojson, { style }).addTo(fullMap);
                         fullMap.fitBounds(geoLayer2.getBounds());
                     }
+                    initialBoundsSet = true; // Stop it from jumping again
                 }
             });
     };
@@ -649,34 +649,46 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const ctx = chartCtx.getContext('2d');
         muniChart = new Chart(ctx, {
-            type: 'line',
+            type: 'bar', // Horizontal Bar Chart for stability
             data: {
                 labels: ['No Data'],
                 datasets: [{
-                    label: 'No incidents recorded yet',
+                    label: 'Total Incidents',
                     data: [0],
-                    backgroundColor: 'rgba(226, 232, 240, 0.2)',
-                    borderColor: '#E2E8F0',
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 4
+                    backgroundColor: '#103155', // Solid premium color
+                    borderRadius: 4,
+                    barThickness: 15
                 }]
             },
             options: {
+                indexAxis: 'y', // Makes it Horizontal
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: false,
                 scales: {
-                    y: {
+                    x: {
                         beginAtZero: true,
                         min: 0,
                         max: 100,
                         ticks: {
-                            stepSize: 1,
-                            precision: 0
+                            stepSize: 10,
+                            font: { size: 12, weight: 'bold' }
                         },
-                        grid: { color: 'rgba(0,0,0,0.05)' }
+                        grid: { color: 'rgba(0,0,0,0.03)' }
                     },
-                    x: { grid: { display: false } }
+                    y: {
+                        ticks: {
+                            font: { size: 11 },
+                            autoSkip: false
+                        },
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                },
+                layout: {
+                    padding: { top: 10, bottom: 10, left: 10, right: 30 }
                 }
             }
         });

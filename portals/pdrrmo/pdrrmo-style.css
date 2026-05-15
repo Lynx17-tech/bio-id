@@ -609,98 +609,102 @@ body {
     }
 }
 
-/* --- Modern Profile Details UI --- */
+/* --- Profile & Account UI --- */
 .profile-details {
     display: flex;
     align-items: center;
-    background: #A0B2C6 !important;
-    border-radius: 8px;
+    background: #F1F5F9 !important; /* Visible light gray on white nav */
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
     height: 48px;
-    padding-right: 12px;
+    padding: 0 12px;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
-    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .profile-details:hover {
-    background: #8FA4BB !important;
+    background: #E2E8F0 !important;
 }
 
 .profile-details img {
-    height: 40px;
-    width: 40px;
-    border-radius: 6px;
+    height: 34px;
+    width: 34px;
+    border-radius: 8px;
     object-fit: cover;
-    margin-left: 4px;
 }
 
 .profile-details .admin_name {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600 !important;
     color: #1E293B !important;
     margin: 0 12px;
 }
 
-.profile-details i.bx-chevron-down {
-    color: #1E293B !important;
-    font-size: 18px;
-}
-
-/* --- Profile Dropdown --- */
+/* --- Premium Glass Dropdown (Mobile & Desktop) --- */
 .profile-dropdown {
     position: absolute;
     top: calc(100% + 10px);
     right: 0;
-    margin-top: 5px;
     background: #FFFFFF !important;
     border: 1px solid #E2E8F0;
     border-radius: 12px;
     width: 200px;
-    z-index: 1000;
+    z-index: 2000;
     display: none;
     flex-direction: column;
-    overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+    padding: 5px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
 }
 
 .profile-dropdown a {
-    padding: 14px 20px;
+    padding: 12px 15px;
     color: #334155 !important;
     text-decoration: none;
     font-size: 14px;
     font-weight: 500;
     display: flex;
     align-items: center;
-    gap: 12px;
-    transition: all 0.2s ease;
-    border-bottom: 1px solid #F1F5F9;
-}
-
-.profile-dropdown a:last-child {
-    border-bottom: none;
-}
-
-.profile-dropdown a span {
-    flex-grow: 1;
-}
-
-.profile-dropdown a i {
-    font-size: 18px;
-    color: #2563EB;
-}
-
-.profile-dropdown a#logoutBtn {
-    color: #475569 !important;
-}
-
-.profile-dropdown a#logoutBtn i {
-    color: #EF4444;
+    gap: 10px;
+    border-radius: 8px;
 }
 
 .profile-dropdown a:hover {
     background: #F8FAFC;
-    padding-left: 24px;
+}
+
+/* --- Enhanced Mobile Responsiveness (Safely Isolated) --- */
+@media (max-width: 768px) {
+    .home-content {
+        padding: 15px 10px !important;
+    }
+
+    .profile-details {
+        background: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(5px);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .profile-details .admin_name {
+        display: none !important;
+    }
+
+    .chart-container, .map-container {
+        height: auto !important;
+        min-height: 400px;
+        padding: 15px !important;
+    }
+
+    .title.d-flex-between {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 15px !important;
+    }
+
+    .filter-actions {
+        flex-direction: column !important;
+        width: 100% !important;
+    }
 }
 
 /* --- Settings Modal --- */
@@ -763,16 +767,271 @@ body {
     padding: 25px !important;
 }
 
-.d-flex {
-    display: flex !important;
+/* --- Enhanced Mobile Responsiveness & Layout Fixes --- */
+
+/* Fix for overlapping headers in tabs */
+@media (max-width: 768px) {
+    .title.d-flex-between {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 15px !important;
+        text-align: left;
+    }
+
+    .filter-actions {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 10px !important;
+    }
+
+    .filter-actions .modern-select, 
+    .filter-actions select,
+    .filter-actions button {
+        width: 100% !important;
+        margin: 0 !important;
+    }
+    
+    .filter-actions .custom-dropdown {
+        width: 100% !important;
+    }
+
+    .reports-table {
+        min-width: 600px; /* Ensure table has enough room to scroll */
+    }
 }
 
-.d-flex-between {
+/* --- Clean Print Styles (Smart-Aware) --- */
+@media print {
+    /* 1. Hide ALL interface elements and dashboard components */
+    .sidebar, 
+    .pdrrmo-nav,
+    .mdrrmo-nav, 
+    .nav-links,
+    .filter-actions,
+    .sidebar-button,
+    .profile-details,
+    .overview-boxes,
+    .analytics-row,
+    .box-topic,
+    .btn,
+    button,
+    input,
+    select {
+        display: none !important;
+    }
+
+    /* 2. Reset the main container for full-page printing */
+    .home-section {
+        width: 100% !important;
+        left: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: #fff !important;
+        position: relative !important;
+    }
+
+    .home-content {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* 3. SMART TAB PRINTING: Only show the tab that is currently visible on screen */
+    .tab-content {
+        display: none !important;
+    }
+    
+    /* Dynamically show the tab that has 'display: block' in the style attribute */
+    .tab-content[style*="display: block"] {
+        display: block !important;
+        width: 100% !important;
+        opacity: 1 !important;
+    }
+
+    .box-glass {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        background: transparent !important;
+    }
+
+    /* 4. Professional Report Header */
+    .print-header {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        padding-bottom: 20px !important;
+        margin-bottom: 30px !important;
+        border-bottom: 2px solid #000 !important;
+    }
+
+    /* 5. Table Layout for Formal Print (Applies to all tabs) */
+    .table-responsive {
+        overflow: visible !important;
+        display: block !important;
+        width: 100% !important;
+    }
+
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+    }
+
+    th, td {
+        border: 1px solid #000 !important;
+        padding: 10px !important;
+        font-size: 11px !important;
+        color: #000 !important;
+    }
+
+    th {
+        background: #f2f2f2 !important;
+        font-weight: bold !important;
+    }
+
+    /* Hide individual action buttons in any table during print */
+    .action-btns, .btn-print, .btn-edit, .btn-delete {
+        display: none !important;
+    }
+}
+
+/* Fix for horizontal overflow and better mobile flow */
+.home-content {
+    overflow-x: hidden;
+}
+
+/* Ensure sidebar labels are visible when sidebar is active/open */
+.sidebar.active .logo-details .logo_name,
+.sidebar.active .nav-links .links_name {
+    display: block !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+.sidebar .nav-links li a {
     display: flex !important;
-    justify-content: space-between !important;
     align-items: center !important;
+    gap: 15px !important;
 }
 
-.mt-4 {
-    margin-top: 1.5rem !important;
+.sidebar .logo-details {
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
+    padding: 0 20px !important;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 15px;
+    border-radius: 8px;
+}
+
+/* Smooth Table Scrollbar */
+.table-responsive::-webkit-scrollbar {
+    height: 4px;
+}
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 10px;
+}
+
+@media (max-width: 1024px) {
+    .overview-boxes.pdrrmo-boxes {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .analytics-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .home-content {
+        padding: 15px 10px !important;
+    }
+
+    .overview-boxes .box {
+        min-height: 120px !important;
+        padding: 15px !important;
+    }
+
+    .overview-boxes .box-topic {
+        font-size: 13px;
+    }
+
+    .overview-boxes .number {
+        font-size: 22px !important;
+    }
+
+    .overview-boxes .cart {
+        height: 45px;
+        width: 45px;
+        line-height: 45px;
+        font-size: 24px;
+    }
+
+    .chart-container, .map-container {
+        height: auto !important;
+        min-height: 400px;
+    }
+
+    .title {
+        font-size: 15px !important;
+        margin-bottom: 15px;
+    }
+
+    .sidebar-button span.dashboard {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .overview-boxes.pdrrmo-boxes {
+        grid-template-columns: 1fr !important;
+    }
+
+    .box-glass {
+        width: 100% !important;
+        overflow-x: hidden !important;
+        padding: 20px !important;
+    }
+
+    .table-responsive {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        margin-top: 15px;
+        border-radius: 8px;
+    }
+
+    .reports-table {
+        min-width: 600px;
+    }
+
+    .reports-table th, .reports-table td {
+        padding: 10px 8px !important;
+        font-size: 13px !important;
+    }
+
+    .profile-details i.bx-chevron-down {
+        display: none;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .btn {
+        width: 100%; /* Full width buttons on very small screens */
+    }
+}
+
+/* Fix for Leaflet Map sizing on mobile */
+#riskMap {
+    min-height: 300px;
 }

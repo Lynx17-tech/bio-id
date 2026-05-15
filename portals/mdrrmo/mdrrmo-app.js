@@ -73,6 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const supabaseKey = 'sb_publishable_7CR3OUMv3lrkGVIfzHko1g_Dpu-yrF0';
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+    const API_URL = `${window.location.origin}/api`;
+
     // --- DYNAMIC CONTENT INJECTION FROM SESSION ---
     let activeMunicipality = 'Barbaza';
     let adminFullName = 'MDRRMO Admin';
@@ -199,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     saveBtn.disabled = true;
 
                     try {
-                        const response = await fetch('http://localhost:4000/api/admin/system-users/' + activeUser.id, {
+                        const response = await fetch(`${API_URL}/admin/system-users/${activeUser.id}`, {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(updates)
@@ -237,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             sessionStorage.removeItem('activeUserData');
-            window.location.href = '../index.html';
+            window.location.href = '../../index.html';
         });
     }
 
@@ -265,7 +267,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!policeTableBody) return;
 
         try {
-            const response = await fetch(`http://localhost:4000/api/police-accounts?jurisdiction=${encodeURIComponent(activeMunicipality)}`);
+            const apiUrl = `${API_URL}/police-accounts?jurisdiction=${encodeURIComponent(activeMunicipality)}`;
+            const response = await fetch(apiUrl);
             const data = await response.json();
 
             if (!response.ok) throw new Error(data.error || 'Failed to fetch');
@@ -435,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
             saveAccountBtn.textContent = 'Saving...';
             saveAccountBtn.disabled = true;
 
-            const response = await fetch('http://localhost:4000/api/police-accounts', {
+            const response = await fetch(`${API_URL}/police-accounts`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -517,7 +520,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 "Delete Account",
                 async () => {
                     try {
-                        const response = await fetch('http://localhost:4000/api/police-accounts/' + accountId, {
+                        const response = await fetch(`${API_URL}/police-accounts/${accountId}`, {
                             method: 'DELETE'
                         });
 
@@ -582,7 +585,7 @@ document.addEventListener('DOMContentLoaded', () => {
             saveBtn.disabled = true;
 
             try {
-                const response = await fetch('http://localhost:4000/api/police-accounts/' + id, {
+                const response = await fetch(`${API_URL}/police-accounts/${id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -615,9 +618,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let barangayChartInstance, severityChartInstance, trendChartInstance;
     let loadedReports = [];
 
-    async function fetchAndRenderReports() {
         try {
-            const response = await fetch(`http://localhost:4000/api/reports?jurisdiction=${encodeURIComponent(activeMunicipality)}`);
+            const apiUrl = `${window.location.protocol}//${window.location.hostname}:4000/api/reports?jurisdiction=${encodeURIComponent(activeMunicipality)}`;
+            const response = await fetch(apiUrl);
             const reports = await response.json();
 
             if (!response.ok) throw new Error('Fetch failed');
@@ -659,17 +662,31 @@ document.addEventListener('DOMContentLoaded', () => {
             totalIndicatorEl.textContent = totalAccidentCount > 0 ? "Reports recorded in jurisdiction" : "No data recorded yet";
         }
 
-        // Active Cases (Reported or Under Investigation)
-        const activeCases = reports.filter(r => r.status === 'Reported' || r.status === 'Under Investigation').length;
+        // Active Cases (Reported or Under Investigation) + 5-day filter (120 hours)
+        const fiveDaysAgo = new Date();
+        fiveDaysAgo.setHours(fiveDaysAgo.getHours() - 120);
+
+        const activeCasesList = reports.filter(r => {
+            const isPending = r.status === 'Reported' || r.status === 'Under Investigation';
+            const isRecent = new Date(r.datetime || r.created_at) >= fiveDaysAgo;
+            return isPending && isRecent;
+        });
+
+        const activeCasesCount = activeCasesList.length;
         const activeNumberEl = document.querySelector('.overview-boxes .box:nth-child(3) .number');
         const activeIndicatorEl = document.querySelector('.overview-boxes .box:nth-child(3) .text');
 
-        if (activeNumberEl) activeNumberEl.textContent = activeCases;
-        if (activeIndicatorEl) activeIndicatorEl.textContent = `${activeCases} pending resolutions`;
+        if (activeNumberEl) activeNumberEl.textContent = activeCasesCount;
+        if (activeIndicatorEl) {
+            activeIndicatorEl.textContent = activeCasesCount > 0 
+                ? `${activeCasesCount} active cases (within 5 days)` 
+                : "No recent active cases";
+        }
 
         // Registered Residents for this Municipality
         try {
-            const response = await fetch(`http://localhost:4000/api/residents/count?municipality=${encodeURIComponent(activeMunicipality)}`);
+            const apiUrl = `${window.location.protocol}//${window.location.hostname}:4000/api/residents/count?municipality=${encodeURIComponent(activeMunicipality)}`;
+            const response = await fetch(apiUrl);
             const result = await response.json();
 
             if (response.ok) {
@@ -688,7 +705,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!residentsTableBody) return;
 
         try {
-            const response = await fetch(`http://localhost:4000/api/residents?municipality=${encodeURIComponent(activeMunicipality)}`);
+            const apiUrl = `${window.location.protocol}//${window.location.hostname}:4000/api/residents?municipality=${encodeURIComponent(activeMunicipality)}`;
+            const response = await fetch(apiUrl);
             const residents = await response.json();
 
             if (!response.ok) throw new Error('Fetch failed');
@@ -783,7 +801,12 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             tableBody.insertAdjacentHTML('beforeend', row);
 
-            if (activeCasesTableBody && r.status !== 'Resolved') {
+            // 5-Day Filter for Active Cases Table (120 Hours)
+            const fiveDaysAgo = new Date();
+            fiveDaysAgo.setHours(fiveDaysAgo.getHours() - 120);
+            const reportDate = new Date(r.datetime || r.created_at);
+
+            if (activeCasesTableBody && r.status !== 'Resolved' && reportDate >= fiveDaysAgo) {
                 activeCasesTableBody.insertAdjacentHTML('beforeend', row);
             }
         });

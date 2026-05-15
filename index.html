@@ -11,6 +11,111 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="manifest" href="manifest.json">
+    <style>
+        /* PWA POPUP STYLES */
+        .pwa-install-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .pwa-install-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .pwa-card {
+            background: linear-gradient(145deg, #103155 0%, #06182C 100%);
+            width: 90%;
+            max-width: 360px;
+            padding: 30px;
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: translateY(20px);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .pwa-install-overlay.show .pwa-card {
+            transform: translateY(0);
+        }
+
+        .pwa-icon-box {
+            width: 80px;
+            height: 80px;
+            background: #2C74B3;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 20px rgba(44, 116, 179, 0.3);
+        }
+
+        .pwa-icon-box i {
+            font-size: 45px;
+            color: white;
+        }
+
+        .pwa-title {
+            color: white;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .pwa-desc {
+            color: #94A3B8;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .pwa-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-install-now {
+            background: #2C74B3;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-install-now:hover {
+            background: #3685cc;
+            transform: scale(1.02);
+        }
+
+        .btn-maybe-later {
+            background: transparent;
+            color: #94A3B8;
+            border: none;
+            padding: 10px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+    </style>
+
 </head>
 
 <body>
@@ -21,21 +126,7 @@
                 <h2>BioID Login</h2>
                 <p>Biometric Recognition System</p>
                 
-                <!-- PREMIUM MOBILE APP PROMPT -->
-                <div id="mobileAppPrompt" class="mobile-app-card" style="display: none; margin-top: 25px; padding: 20px; background: rgba(44, 116, 179, 0.05); border: 1px solid rgba(44, 116, 179, 0.15); border-radius: 20px; text-align: left;">
-                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                        <div style="width: 50px; height: 50px; background: #2C74B3; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 16px rgba(44, 116, 179, 0.2);">
-                            <i class='bx bx-fingerprint' style="font-size: 30px; color: white;"></i>
-                        </div>
-                        <div>
-                            <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: #06182C;">BioID Mobile</h4>
-                            <p style="margin: 0; font-size: 11px; color: #64748B;">Install for a better experience</p>
-                        </div>
-                    </div>
-                    <button id="pwaInstallBtn" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #2C74B3 0%, #103155 100%); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(44, 116, 179, 0.3);">
-                        <i class='bx bx-download'></i> Install Now
-                    </button>
-                </div>
+
                 <p>Welcome back. Please enter your credentials.</p>
             </div>
 
@@ -82,55 +173,73 @@
     <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="login-logic.js"></script>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwaOverlay" class="pwa-install-overlay">
+        <div class="pwa-card">
+            <div class="pwa-icon-box">
+                <i class='bx bx-fingerprint'></i>
+            </div>
+            <h3 class="pwa-title">BioID Mobile</h3>
+            <p class="pwa-desc">Install our application for a faster, more secure biometric experience on your device.</p>
+            <div class="pwa-actions">
+                <button id="pwaInstallBtn" class="btn-install-now">Install Application</button>
+                <button id="pwaCloseBtn" class="btn-maybe-later">Maybe Later</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // PWA SERVICE WORKER REGISTRATION
+        // 1. Service Worker Registration
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('Service Worker Registered'))
-                .catch(err => console.log('Service Worker Failed', err));
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('SW Registered'))
+                    .catch(err => console.log('SW Failed', err));
+            });
         }
 
-        // PWA INSTALL LOGIC
+        // 2. Install Logic
         let deferredPrompt;
+        const pwaOverlay = document.getElementById('pwaOverlay');
         const installBtn = document.getElementById('pwaInstallBtn');
-        const mobilePrompt = document.getElementById('mobileAppPrompt');
+        const closeBtn = document.getElementById('pwaCloseBtn');
 
-        // Wait for the browser to be ready for installation
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent the default browser bar from showing
             e.preventDefault();
-            // Save the event so it can be triggered later
             deferredPrompt = e;
-            // Now that we are ready, show the premium install card
-            if (mobilePrompt) {
-                mobilePrompt.style.display = 'block';
-            }
+            
+            // Show pop-up after a 2 second delay when page loads
+            setTimeout(() => {
+                if (pwaOverlay) pwaOverlay.classList.add('show');
+            }, 2000);
         });
 
         if (installBtn) {
             installBtn.addEventListener('click', async () => {
                 if (deferredPrompt) {
-                    // Show the native install prompt
                     deferredPrompt.prompt();
-                    // Wait for the user to respond to the prompt
                     const { outcome } = await deferredPrompt.userChoice;
                     if (outcome === 'accepted') {
-                        console.log('User accepted the BioID install');
-                        mobilePrompt.style.display = 'none';
+                        pwaOverlay.classList.remove('show');
                     }
                     deferredPrompt = null;
                 }
             });
         }
 
-        // Hide prompt if app is already installed
-        window.addEventListener('appinstalled', (evt) => {
-            if (mobilePrompt) {
-                mobilePrompt.style.display = 'none';
-            }
-            console.log('BioID was installed');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                pwaOverlay.classList.remove('show');
+            });
+        }
+
+        window.addEventListener('appinstalled', () => {
+            if (pwaOverlay) pwaOverlay.classList.remove('show');
+            deferredPrompt = null;
         });
     </script>
+
 </body>
 
 </html>

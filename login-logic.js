@@ -55,7 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
             loginBtn.disabled = true;
 
             try {
-                const response = await fetch('http://localhost:4000/api/auth/login', {
+                // Dynamically determine the API URL based on the current origin
+                // This supports localhost, local network IP, and Localtunnel automatically
+                const apiBase = window.location.origin;
+                const apiUrl = `${apiBase}/api/auth/login`;
+
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
@@ -96,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             } catch (err) {
                 console.error(err);
-                showCustomAlert("Local Server Connection Error. Please ensure 'npm start' is running.", 'error', 'Connection Error');
+                showCustomAlert("Local Server Connection Error. Please ensure the backend is running by executing 'npm run server' in your terminal.", 'error', 'Connection Error');
                 loginBtn.innerHTML = originalBtnText;
                 loginBtn.disabled = false;
             }

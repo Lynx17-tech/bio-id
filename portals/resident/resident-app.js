@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const supabaseUrl = 'https://rbncteviieusldynswny.supabase.co';
     const supabaseKey = 'sb_publishable_7CR3OUMv3lrkGVIfzHko1g_Dpu-yrF0';
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    const API_URL = `${window.location.origin}/api`;
 
     // --- TAB SWITCHING LOGIC ---
     const navBtns = document.querySelectorAll('.nav-btn');
@@ -38,27 +39,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- RESIDENT DATA HANDLING ---
     const loadResidentData = async () => {
-        // Mocking a logged-in resident - In reality, this will come from login session
         let resident = null;
         const sessionData = sessionStorage.getItem('activeUserData');
         
         if (sessionData) {
             resident = JSON.parse(sessionData);
+            renderProfile(resident);
+            fetchIncidentReports(resident.municipality);
         } else {
-            // Placeholder for demonstration
-            resident = {
-                first_name: "Juan",
-                last_name: "Dela Cruz",
-                municipality: "Barbaza",
-                blood_type: "O+",
-                medical_remarks: "No allergies",
-                fingerprint_id: "Captured (F-0912)",
-                status: "Verified"
-            };
+            // Redirect to login if no session (Production Security)
+            window.location.href = '../../index.html';
         }
-
-        renderProfile(resident);
-        fetchIncidentReports(resident.municipality);
     };
 
     const renderProfile = (res) => {
@@ -110,7 +101,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fetchIncidentReports = async (municipality) => {
         try {
-            const response = await fetch(`http://localhost:4000/api/reports?jurisdiction=${encodeURIComponent(municipality)}`);
+            const apiUrl = `${API_URL}/reports?jurisdiction=${encodeURIComponent(municipality)}`;
+            const response = await fetch(apiUrl);
             const data = await response.json();
 
             const tbody = document.getElementById('resident-reports-body');
@@ -172,7 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fetchHighRiskZones = async () => {
         try {
-            const response = await fetch('http://localhost:4000/api/reports/statistics');
+            const apiUrl = `${API_URL}/reports/statistics`;
+            const response = await fetch(apiUrl);
             const data = await response.json();
             
             // Marker logic based on frequency in data...
@@ -274,7 +267,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:4000/api/residents/update-account`, {
+            const apiUrl = `${API_URL}/residents/update-account`;
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -333,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutBtn.onclick = (e) => {
             e.preventDefault();
             sessionStorage.removeItem('activeUserData');
-            window.location.href = '../index.html';
+            window.location.href = '../../index.html';
         };
     }
 

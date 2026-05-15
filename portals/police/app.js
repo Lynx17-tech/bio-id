@@ -845,37 +845,57 @@ document.addEventListener('DOMContentLoaded', async () => {
             // --- MOBILE OTG LOGIC (Android) ---
             try {
                 if (!window.usbserial) {
-                    showCustomAlert("USB Serial plugin not found. Please ensure it is installed.", "error");
+                    showCustomAlert("USB Serial plugin not found. Please ensure the native plugin is built into the APK.", "error", "Plugin Missing");
                     return;
                 }
-                // Arduino Uno (CdcAcm) - vid: 0x2341, pid: 0x0043
-                window.usbserial.requestPermission({vid: '2341', pid: '0043'}, async () => {
-                    window.usbserial.connect({baudRate: 57600}, () => {
-                        scannerActive = true;
-                        updateScannerUI('online');
-                        logToTerminal("Mobile OTG: Arduino Connected!", "SUCCESS");
-                        showCustomAlert("Arduino OTG Connected!", "success", "Hardware Ready");
-                        
-                        // Listen for fingerprint data from OTG
-                        window.usbserial.registerReadCallback((data) => {
-                            const view = new Uint8Array(data);
-                            let str = "";
-                            for (let i = 0; i < view.length; i++) {
-                                str += String.fromCharCode(view[i]);
-                            }
-                            handleHardwareInput(str);
-                        }, (err) => console.error("OTG Read Error:", err));
+
+                // List of common Arduino/Serial Chip VID/PIDs
+                const targetDevices = [
+                    { vid: '2341', pid: '0043' }, // Uno
+                    { vid: '1A86', pid: '7523' }, // CH340 (Clones)
+                    { vid: '10C4', pid: 'EA60' }, // CP2102
+                    { vid: '0403', pid: '6001' }  // FTDI
+                ];
+
+                const tryConnect = (index) => {
+                    if (index >= targetDevices.length) {
+                        showCustomAlert("No compatible Arduino found. Check OTG cable or enable 'OTG' in Phone Settings.", "error", "Hardware Not Found");
+                        return;
+                    }
+
+                    const dev = targetDevices[index];
+                    console.log(`Attempting OTG connection to VID:${dev.vid} PID:${dev.pid}`);
+
+                    window.usbserial.requestPermission(dev, () => {
+                        window.usbserial.connect({ baudRate: 57600 }, () => {
+                            scannerActive = true;
+                            updateScannerUI('online');
+                            logToTerminal(`Mobile OTG: Connected to Device ${dev.vid}:${dev.pid}`, "SUCCESS");
+                            showCustomAlert("Hardware Connected via OTG!", "success", "Hardware Ready");
+                            
+                            window.usbserial.registerReadCallback((data) => {
+                                const view = new Uint8Array(data);
+                                let str = "";
+                                for (let i = 0; i < view.length; i++) {
+                                    str += String.fromCharCode(view[i]);
+                                }
+                                handleHardwareInput(str);
+                            }, (err) => console.error("OTG Read Error:", err));
+                        }, (err) => {
+                            console.warn(`Failed to connect to ${dev.vid}, trying next...`);
+                            tryConnect(index + 1);
+                        });
                     }, (err) => {
-                        console.error("OTG Connect Error:", err);
-                        showCustomAlert("OTG Connection Failed. Check cable.", "error");
+                        // Permission denied or device not found for this specific VID/PID
+                        tryConnect(index + 1);
                     });
-                }, (err) => {
-                    console.error("OTG Permission Error:", err);
-                    showCustomAlert("OTG Permission Denied", "warning");
-                });
+                };
+
+                tryConnect(0);
+
             } catch (e) {
                 console.error("Capacitor OTG Error:", e);
-                showCustomAlert("Hardware error: " + e.message, "error");
+                showCustomAlert("Mobile hardware error: " + e.message, "error");
             }
         } else {
             // --- DESKTOP BROWSER LOGIC ---
@@ -990,6 +1010,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                             showCustomAlert(`FINGERPRINT SAVED! Resident assigned ID ${id}`, "success", "Hardware Ready");
                         }
                     }
+                } else if (line.includes("ENROLL_FAILED") || line.includes("ENROLL_ERROR")) {
+                    console.error("Hardware Enrollment Failed:", line);
+                    logToTerminal(`HARDWARE ERROR: Enrollment Failed. Reason: ${line}`, "ERROR");
+                    showCustomAlert("Enrollment Failed! Please ensure your finger is placed correctly and try again.", "error", "Hardware Error");
+                    
+                    // Reset UI to allow retry
+                    const initialState = document.getElementById('resScannerInitialState');
+                    const verifiedState = document.getElementById('resVerifiedState');
+                    if (initialState) initialState.style.display = 'block';
+                    if (verifiedState) verifiedState.style.display = 'none';
                 }
 
                 // 2. HANDLE MATCH (Identification)
@@ -1000,6 +1030,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                         logToTerminal(`SCANNER: Analyzing Fingerprint (Match found: ${id})`, "SCANNER");
                         await autoIdentifyVictim(id);
                     }
+                } else if (line.includes("MATCH_FAILED") || line.includes("NOT_FOUND")) {
+                    console.warn("Hardware Identification Failed:", line);
+                    logToTerminal("SCANNER: Identity Not Found in Hardware Database", "WARNING");
+                    // Only alert if we aren't already in identification mode (to avoid spamming)
+                    if (!reportModal.classList.contains('show')) {
+                        showCustomAlert("Fingerprint not recognized. Please ensure the resident is registered.", "warning", "Identity Unknown");
+                    }
+                }
+                
+                // 3. HANDLE IMAGE ERRORS (Common in biometric sensors)
+                if (line.includes("IMAGE_MESSY") || line.includes("IMAGE_FAIL")) {
+                    showCustomAlert("Scan was too messy or blurry. Please place your finger firmly and try again.", "warning", "Scan Error");
                 }
                 
                 setTimeout(() => updateScannerUI('online'), 1000);
@@ -1008,71 +1050,72 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function autoIdentifyVictim(hardwareId) {
-        // DO NOT show identification alert if we are CURRENTLY Registering a new resident
-        if (residentModal && residentModal.classList.contains('show')) {
-            console.log("Scanner: Match found, but resident modal is open. Skipping identification.");
+        // Only block if we are CURRENTLY capturing a fingerprint for registration
+        const isRegistering = residentModal && residentModal.classList.contains('show') && 
+                             document.getElementById('resScannerInitialState').style.display === 'none';
+        
+        if (isRegistering) {
+            console.log("Scanner: Match found, but registration is in progress. Skipping identification.");
             return;
         }
 
         try {
+            console.log(`Searching for resident with Fingerprint ID: ${hardwareId}`);
+            
+            // Search by both string and numeric ID to be safe
             const { data: residents, error } = await supabase
                 .from('residents')
                 .select('*')
-                .eq('fingerprint_id', hardwareId);
+                .or(`fingerprint_id.eq.${hardwareId},fingerprint_id.eq."${hardwareId}"`);
 
             if (error) throw error;
 
-            if (residents.length === 0) {
-                showCustomAlert(`Scanner recognized ID ${hardwareId}, but this person is not in our system yet.`, "error", "Unknown Fingerprint");
+            if (!residents || residents.length === 0) {
+                logToTerminal(`Match found for ID ${hardwareId}, but no resident found in Supabase.`, "WARNING");
+                showCustomAlert(`Scanner recognized ID ${hardwareId}, but this person is not in our system yet.`, "warning", "Unknown Resident");
                 return;
             }
 
             const person = residents[0];
+            logToTerminal(`VICTIM IDENTIFIED: ${person.first_name} ${person.last_name}`, "SUCCESS");
 
-            // AUTO-OPEN ACCIDENT REPORT MODAL
+            // Ensure the Report Modal is open
             if (!reportModal.classList.contains('show')) {
                 openReportModal();
             }
 
-            // POPULATE DATA
-            const victimInfoArea = document.getElementById('victimInfoArea');
-            const victimNameText = document.getElementById('victimNameText');
-            const victimAddressText = document.getElementById('victimAddressText');
-            const involvedInput = document.getElementById('reportInvolved');
+            // Small delay to ensure modal transition doesn't clear our population
+            setTimeout(() => {
+                const victimInfoArea = document.getElementById('victimInfoArea');
+                const victimNameText = document.getElementById('victimNameText');
+                const victimAddressText = document.getElementById('victimAddressText');
+                const involvedInput = document.getElementById('reportInvolved');
 
-            victimInfoArea.style.display = 'block';
-            victimNameText.textContent = `${person.first_name} ${person.last_name}`;
-            victimAddressText.innerHTML = `${person.barangay}, ${person.municipality} <br> <span style="color:#EF4444; font-weight:700;">Blood: ${person.blood_type || 'Unknown'}</span>`;
-            
-            involvedInput.value = `VICTIM IDENTIFIED AUTOMATICALLY\nName: ${person.first_name} ${person.last_name}\nBlood Type: ${person.blood_type || 'Unknown'}\nMedical: ${person.medical_info || 'None'}\nEmergency: ${person.emergency_contact || 'None'} (${person.emergency_phone || 'N/A'})\n\nNotes: `;
-            
-            // Switch to Verified UI
-            const scannerInitialState = document.getElementById('scannerInitialState');
-            const verifiedState = document.getElementById('verifiedState');
-            const rescanBtn = document.getElementById('rescanBtn');
+                if (victimInfoArea) victimInfoArea.style.display = 'block';
+                if (victimNameText) victimNameText.textContent = `${person.first_name} ${person.last_name}`;
+                if (victimAddressText) {
+                    victimAddressText.innerHTML = `${person.barangay}, ${person.municipality} <br> <span style="color:#EF4444; font-weight:700;">Blood Type: ${person.blood_type || 'Unknown'}</span>`;
+                }
+                
+                if (involvedInput) {
+                    involvedInput.value = `VICTIM IDENTIFIED AUTOMATICALLY\nName: ${person.first_name} ${person.last_name}\nBlood Type: ${person.blood_type || 'Unknown'}\nMedical: ${person.medical_info || 'None'}\nEmergency: ${person.emergency_contact || 'None'} (${person.emergency_phone || 'N/A'})\n\nNotes: `;
+                    // Auto resize
+                    involvedInput.style.height = 'auto';
+                    involvedInput.style.height = involvedInput.scrollHeight + 'px';
+                }
+                
+                // Switch to Verified UI in the scanner section of the modal
+                const scannerInitialState = document.getElementById('scannerInitialState');
+                const verifiedState = document.getElementById('verifiedState');
+                if (scannerInitialState) scannerInitialState.style.display = 'none';
+                if (verifiedState) verifiedState.style.display = 'flex';
 
-            if (scannerInitialState) scannerInitialState.style.display = 'none';
-            if (verifiedState) verifiedState.style.display = 'flex';
-
-            if (rescanBtn) {
-                rescanBtn.onclick = () => {
-                    if (scannerInitialState) scannerInitialState.style.display = 'block';
-                    if (verifiedState) verifiedState.style.display = 'none';
-                    if (victimInfoArea) victimInfoArea.style.display = 'none';
-                    involvedInput.value = "";
-                    logToTerminal("User chose to re-scan/clear identification", "INFO");
-                };
-            }
-
-            // Auto resize
-            involvedInput.style.height = 'auto';
-            involvedInput.style.height = involvedInput.scrollHeight + 'px';
-            
-            logToTerminal(`VICTIM IDENTIFIED: ${person.first_name} ${person.last_name}`, "SUCCESS");
-            showCustomAlert("Resident identity verified. Data pulled automatically.", "success", "Identity Verified");
+                showCustomAlert(`Resident identity verified: ${person.first_name} ${person.last_name}`, "success", "Identity Verified");
+            }, 100);
 
         } catch (err) {
             console.error("Identification Error:", err);
+            showCustomAlert("Error connecting to database during identification.", "error", "Database Error");
         }
     }
 

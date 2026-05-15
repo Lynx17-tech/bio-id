@@ -616,11 +616,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadReports() {
         try {
-            const apiUrl = `${API_URL}/reports?jurisdiction=${encodeURIComponent(activeMunicipality)}`;
-            const response = await fetch(apiUrl);
-            const reports = await response.json();
+            const { data: reports, error } = await supabase
+                .from('accident_reports')
+                .select('*')
+                .eq('jurisdiction', activeMunicipality.trim())
+                .order('datetime', { ascending: false });
 
-            if (!response.ok) throw new Error('Fetch failed');
+            if (error) throw error;
             loadedReports = reports;
 
             applyFilters();
@@ -684,13 +686,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Registered Residents for this Municipality
         try {
-            const apiUrl = `${API_URL}/residents/count?municipality=${encodeURIComponent(activeMunicipality)}`;
-            const response = await fetch(apiUrl);
-            const result = await response.json();
+            const { count, error } = await supabase
+                .from('residents')
+                .select('*', { count: 'exact', head: true })
+                .eq('municipality', activeMunicipality.trim());
 
-            if (response.ok) {
+            if (!error) {
                 const resNumberEl = document.getElementById('stats-residents');
-                if (resNumberEl) resNumberEl.textContent = result.count;
+                if (resNumberEl) resNumberEl.textContent = count;
             }
         } catch (e) {
             console.error("Error fetching resident count:", e);
@@ -704,11 +707,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!residentsTableBody) return;
 
         try {
-            const apiUrl = `${API_URL}/residents?municipality=${encodeURIComponent(activeMunicipality)}`;
-            const response = await fetch(apiUrl);
-            const residents = await response.json();
+            const { data: residents, error } = await supabase
+                .from('residents')
+                .select('*')
+                .eq('municipality', activeMunicipality.trim());
 
-            if (!response.ok) throw new Error('Fetch failed');
+            if (error) throw error;
 
             residentsTableBody.innerHTML = '';
             if (residents.length === 0) {

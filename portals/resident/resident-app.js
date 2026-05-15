@@ -101,9 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fetchIncidentReports = async (municipality) => {
         try {
-            const apiUrl = `${API_URL}/reports?jurisdiction=${encodeURIComponent(municipality)}`;
-            const response = await fetch(apiUrl);
-            const data = await response.json();
+            const { data, error } = await supabase
+                .from('accident_reports')
+                .select('*')
+                .eq('jurisdiction', municipality.trim())
+                .order('datetime', { ascending: false });
+
+            if (error) throw error;
 
             const tbody = document.getElementById('resident-reports-body');
             
@@ -127,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (err) {
             console.error("Error fetching municipality reports:", err);
-            document.getElementById('resident-reports-body').innerHTML = `<tr><td colspan="5" class="text-center py-4 text-danger">Failed to load reports from server</td></tr>`;
+            document.getElementById('resident-reports-body').innerHTML = `<tr><td colspan="5" class="text-center py-4 text-danger">Failed to load reports from database</td></tr>`;
         }
     };
 
@@ -164,12 +168,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fetchHighRiskZones = async () => {
         try {
-            const apiUrl = `${API_URL}/reports/statistics`;
-            const response = await fetch(apiUrl);
-            const data = await response.json();
+            const { data: reports, error } = await supabase
+                .from('accident_reports')
+                .select('location, jurisdiction, severity');
+            
+            if (error) throw error;
             
             // Marker logic based on frequency in data...
-            // Mock markers for residents to see hotspots
+            // Mock markers for residents to see hotspots (can be replaced with real geocoding)
             const hotspots = [
                 { name: "San Jose Public Plaza Area", lat: 10.74, lng: 121.94, risk: "High" },
                 { name: "Sibalom Crossing", lat: 10.78, lng: 122.01, risk: "Moderate" },

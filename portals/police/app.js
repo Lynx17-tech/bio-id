@@ -432,7 +432,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const { data: reports, error } = await supabase
                 .from('accident_reports')
                 .select('*')
-                .eq('jurisdiction', assignedJurisdiction)
+                .eq('jurisdiction', (assignedJurisdiction || '').trim())
                 .order('datetime', { ascending: false });
 
             if (error) throw error;
@@ -484,28 +484,36 @@ document.addEventListener('DOMContentLoaded', async () => {
             return row;
         };
 
-        dashboardReportsTableBody.innerHTML = '';
-        fullReportsTableBody.innerHTML = '';
+        if (dashboardReportsTableBody) dashboardReportsTableBody.innerHTML = '';
+        if (fullReportsTableBody) fullReportsTableBody.innerHTML = '';
+
+        if (!reports || reports.length === 0) {
+            const emptyMsg = `<tr><td colspan="6" style="text-align:center; padding:20px; color:#94A3B8;">No reports found for this jurisdiction.</td></tr>`;
+            if (dashboardReportsTableBody) dashboardReportsTableBody.innerHTML = emptyMsg;
+            if (fullReportsTableBody) fullReportsTableBody.innerHTML = emptyMsg;
+            return;
+        }
 
         reports.forEach((r, idx) => {
-            if (idx < 5) dashboardReportsTableBody.appendChild(createRow(r, false));
-            fullReportsTableBody.appendChild(createRow(r, true));
+            if (idx < 5 && dashboardReportsTableBody) {
+                dashboardReportsTableBody.appendChild(createRow(r, false));
+            }
+            if (fullReportsTableBody) {
+                fullReportsTableBody.appendChild(createRow(r, true));
+            }
         });
-
-        if (reports.length === 0) {
-            const emptyMsg = `<tr><td colspan="6" style="text-align:center; padding:20px; color:#94A3B8;">No reports found for this jurisdiction.</td></tr>`;
-            dashboardReportsTableBody.innerHTML = emptyMsg;
-            fullReportsTableBody.innerHTML = emptyMsg;
-        }
     };
 
     const updateStatsAndCharts = (reports) => {
-        document.getElementById('stats-accidents').textContent = reports.length;
+        const statsAccidents = document.getElementById('stats-accidents');
+        if (statsAccidents) statsAccidents.textContent = reports.length;
+
         const heroEl = document.getElementById('stats-accidents-hero');
         if (heroEl) heroEl.textContent = reports.length;
 
         const criticalCount = reports.filter(r => r.severity === 'Critical' || r.severity === 'Severe').length;
-        document.getElementById('stats-critical').textContent = criticalCount;
+        const statsCritical = document.getElementById('stats-critical');
+        if (statsCritical) statsCritical.textContent = criticalCount;
 
         // Clear Map Markers
         markerLayer.clearLayers();

@@ -584,17 +584,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!coords) {
             try {
-                // Try with "Barangay" first
-                let query = `Barangay ${report.location}, ${report.jurisdiction}, Antique, Philippines`;
-                let response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
-                let data = await response.json();
-
-                // If not found, try without "Barangay"
-                if (!data || data.length === 0) {
-                    query = `${report.location}, ${report.jurisdiction}, Antique, Philippines`;
-                    response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
-                    data = await response.json();
-                }
+                // Add "Barangay" prefix to help the search engine
+                const query = `Barangay ${report.location}, ${report.jurisdiction}, Antique, Philippines`;
+                const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
+                const data = await response.json();
 
                 if (data && data.length > 0) {
                     coords = [parseFloat(data[0].lat), parseFloat(data[0].lon)];

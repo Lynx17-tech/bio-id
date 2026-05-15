@@ -515,6 +515,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         const statsCritical = document.getElementById('stats-critical');
         if (statsCritical) statsCritical.textContent = criticalCount;
 
+        // Update Indicators dynamically
+        const accText = document.getElementById('stats-accidents-text');
+        const accIcon = document.getElementById('stats-accidents-icon');
+        if (accText && accIcon) {
+            if (reports.length > 0) {
+                accText.textContent = "Incidents in your jurisdiction";
+                accIcon.className = 'bx bx-up-arrow-alt';
+                accIcon.style.color = "#10B981"; // Success green
+            } else {
+                accText.textContent = "No incidents recorded";
+                accIcon.className = 'bx bx-minus';
+                accIcon.style.color = "inherit";
+            }
+        }
+
+        const critText = document.getElementById('stats-critical-text');
+        const critIcon = document.getElementById('stats-critical-icon');
+        if (critText && critIcon) {
+            if (criticalCount > 0) {
+                critText.textContent = `${criticalCount} urgent cases pending`;
+                critIcon.className = 'bx bx-error-circle';
+                critIcon.style.color = "#EF4444"; // Error red
+            } else {
+                critText.textContent = "0 pending resolutions";
+                critIcon.className = 'bx bx-check';
+                critIcon.style.color = "#10B981";
+            }
+        }
+
         // Clear Map Markers
         markerLayer.clearLayers();
         fullMarkerLayer.clearLayers();

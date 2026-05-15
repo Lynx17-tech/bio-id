@@ -424,10 +424,15 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: "Internal Server Error", details: err.message });
 });
 
-// Start Server
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`\n🚀 [${new Date().toLocaleTimeString()}] BioID Local Server (v2) running at http://localhost:${PORT}/`);
-    console.log(`📁 Database: ${dbPath}`);
-    console.log(`✨ SQLite is now handling all logins and reports!`);
-    console.log(`\nTo test on mobile, run: npx localtunnel --port ${PORT}\n`);
-});
+// Start Server locally if not running on Vercel
+if (process.env.VERCEL !== '1' && process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`\n🚀 [${new Date().toLocaleTimeString()}] BioID Local Server (v2) running at http://localhost:${PORT}/`);
+        console.log(`📁 Database: ${dbPath}`);
+        console.log(`✨ SQLite is now handling all logins and reports!`);
+        console.log(`\nTo test on mobile, run: npx localtunnel --port ${PORT}\n`);
+    });
+}
+
+// Export for Vercel serverless functions
+module.exports = app;

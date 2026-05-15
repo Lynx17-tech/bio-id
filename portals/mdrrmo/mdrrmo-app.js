@@ -620,7 +620,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadReports() {
         try {
-            const apiUrl = `${window.location.protocol}//${window.location.hostname}:4000/api/reports?jurisdiction=${encodeURIComponent(activeMunicipality)}`;
+            const apiUrl = `${API_URL}/reports?jurisdiction=${encodeURIComponent(activeMunicipality)}`;
             const response = await fetch(apiUrl);
             const reports = await response.json();
 
@@ -688,7 +688,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Registered Residents for this Municipality
         try {
-            const apiUrl = `${window.location.protocol}//${window.location.hostname}:4000/api/residents/count?municipality=${encodeURIComponent(activeMunicipality)}`;
+            const apiUrl = `${API_URL}/residents/count?municipality=${encodeURIComponent(activeMunicipality)}`;
             const response = await fetch(apiUrl);
             const result = await response.json();
 
@@ -708,7 +708,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!residentsTableBody) return;
 
         try {
-            const apiUrl = `${window.location.protocol}//${window.location.hostname}:4000/api/residents?municipality=${encodeURIComponent(activeMunicipality)}`;
+            const apiUrl = `${API_URL}/residents?municipality=${encodeURIComponent(activeMunicipality)}`;
             const response = await fetch(apiUrl);
             const residents = await response.json();
 

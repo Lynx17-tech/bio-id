@@ -133,18 +133,21 @@ nav {
 .profile-details {
     display: flex;
     align-items: center;
+    justify-content: center;
     background: #F1F5F9;
-    padding: 6px 15px 6px 6px;
-    border-radius: 10px;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
     cursor: pointer;
     position: relative;
     border: 1px solid var(--police-border);
+    padding: 0;
+    overflow: hidden;
 }
 
 .profile-details img {
-    height: 38px;
-    width: 38px;
-    border-radius: 8px;
+    height: 100%;
+    width: 100%;
     object-fit: cover;
 }
 

@@ -584,7 +584,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!coords) {
             try {
-                const query = `${report.location}, ${report.jurisdiction}, Antique, Philippines`;
+                // Add "Barangay" prefix to help the search engine
+                const query = `Barangay ${report.location}, ${report.jurisdiction}, Antique, Philippines`;
                 const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
                 const data = await response.json();
 
@@ -607,10 +608,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (coords) {
-            // Add a tiny random jitter (approx 10-20 meters) to prevent perfect overlapping markers
+            // Use a tiny jitter (approx 5-10 meters) just to prevent perfect overlap
             const jitteredCoords = [
-                coords[0] + (Math.random() - 0.5) * 0.0005,
-                coords[1] + (Math.random() - 0.5) * 0.0005
+                coords[0] + (Math.random() - 0.5) * 0.0001,
+                coords[1] + (Math.random() - 0.5) * 0.0001
             ];
             addMarkerToMap(jitteredCoords, report);
         }

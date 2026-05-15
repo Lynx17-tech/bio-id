@@ -618,6 +618,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let barangayChartInstance, severityChartInstance, trendChartInstance;
     let loadedReports = [];
 
+    async function loadReports() {
         try {
             const apiUrl = `${window.location.protocol}//${window.location.hostname}:4000/api/reports?jurisdiction=${encodeURIComponent(activeMunicipality)}`;
             const response = await fetch(apiUrl);
@@ -632,6 +633,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching reports:', err);
         }
     }
+
+    loadReports();
 
     function applyFilters() {
         let filtered = [...loadedReports];

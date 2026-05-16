@@ -617,14 +617,23 @@ body {
     border: 1px solid #E2E8F0;
     border-radius: 12px;
     height: 48px;
-    padding: 0 12px;
+    width: auto !important; /* Allow name to be visible */
+    overflow: visible !important; /* Allow dropdown to show */
+    padding: 0 15px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    user-select: none;
 }
 
 .profile-details:hover {
     background: #E2E8F0 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.profile-details:active {
+    transform: translateY(0);
 }
 
 .profile-details img {
@@ -639,22 +648,23 @@ body {
     font-weight: 600 !important;
     color: #1E293B !important;
     margin: 0 12px;
+    white-space: nowrap;
 }
 
 /* --- Premium Glass Dropdown (Mobile & Desktop) --- */
 .profile-dropdown {
     position: absolute;
-    top: calc(100% + 10px);
+    top: calc(100% + 12px);
     right: 0;
     background: #FFFFFF !important;
     border: 1px solid #E2E8F0;
-    border-radius: 12px;
-    width: 200px;
+    border-radius: 16px;
+    width: 220px;
     z-index: 2000;
     display: none;
     flex-direction: column;
-    padding: 5px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+    padding: 8px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
 }
 
 .profile-dropdown a {

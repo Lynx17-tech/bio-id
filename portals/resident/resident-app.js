@@ -328,6 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoutBtn) {
         logoutBtn.onclick = (e) => {
             e.preventDefault();
+            e.stopPropagation();
             sessionStorage.removeItem('activeUserData');
             window.location.href = '../../index.html';
         };
@@ -336,6 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (settingsDropdownBtn) {
         settingsDropdownBtn.onclick = (e) => {
             e.preventDefault();
+            e.stopPropagation();
             const settingsTabBtn = document.querySelector('.nav-btn[data-tab="settings"]');
             if (settingsTabBtn) settingsTabBtn.click();
         };

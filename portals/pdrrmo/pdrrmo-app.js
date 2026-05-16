@@ -78,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Pre-fill user data
             if (activeUser) {
+                document.getElementById('settingsUsername').value = activeUser.username || '';
                 document.getElementById('settingsFirstName').value = activeUser.first_name || '';
                 document.getElementById('settingsLastName').value = activeUser.last_name || '';
                 document.getElementById('settingsContact').value = activeUser.contact_number || '';
@@ -103,12 +104,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const confirmed = await window.confirm('Are you sure you want to update your profile settings?');
                 if (!confirmed) return;
 
-                const newFirst = document.getElementById('settingsFirstName').value;
-                const newLast = document.getElementById('settingsLastName').value;
-                const newContact = document.getElementById('settingsContact').value;
-                const newPass = document.getElementById('settingsPassword').value;
+                const newUsername = document.getElementById('settingsUsername').value.trim();
+                const newFirst = document.getElementById('settingsFirstName').value.trim();
+                const newLast = document.getElementById('settingsLastName').value.trim();
+                const newContact = document.getElementById('settingsContact').value.trim();
+                const newPass = document.getElementById('settingsPassword').value.trim();
 
                 let updates = {
+                    username: newUsername,
                     first_name: newFirst,
                     last_name: newLast,
                     contact_number: newContact,
@@ -148,7 +151,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
+            e.stopPropagation(); // Prevent bubbling to profileDropdownBtn
+            
+            // Clear session
             sessionStorage.removeItem('activeUserData');
+            
+            // Redirect to root login
             window.location.href = '../../index.html';
         });
     }

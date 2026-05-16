@@ -146,20 +146,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // LOGOUT LOGIC
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation(); // Prevent bubbling to profileDropdownBtn
-            
-            // Clear session
-            sessionStorage.removeItem('activeUserData');
-            
-            // Redirect to root login
-            window.location.href = '../../index.html';
-        });
-    }
+    // LOGOUT LOGIC is now handled directly in index.html via href and onclick for better mobile reliability.
+
 
     // SAVE ORIGINAL MODALS FOR FALLBACK
     window.__originalAlert = window.alert;

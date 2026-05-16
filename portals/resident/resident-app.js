@@ -325,14 +325,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (logoutBtn) {
-        logoutBtn.onclick = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            sessionStorage.removeItem('activeUserData');
-            window.location.href = '../../index.html';
-        };
-    }
+    // LOGOUT LOGIC is now handled directly in index.html via href and onclick for better mobile reliability.
+
 
     if (settingsDropdownBtn) {
         settingsDropdownBtn.onclick = (e) => {

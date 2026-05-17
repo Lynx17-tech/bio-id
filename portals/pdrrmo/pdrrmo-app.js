@@ -248,6 +248,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => map.invalidateSize(), 50);
             }
 
+            // Fetch admins when opening accounts tab
+            if (btn.dataset.tab === 'accounts') {
+                fetchAdmins();
+            }
+
             // Mobile Sidebar Auto-close
             if (window.innerWidth <= 768 && sidebar.classList.contains("active")) {
                 sidebar.classList.remove("active");
@@ -305,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let editingRow = null;
 
 // 3. FETCH ADMINS ON LOAD
-    const fetchAdmins = async () => {
+    async function fetchAdmins() {
         try {
             const { data, error } = await supabase
                 .from('system_users')
@@ -372,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Helper: Dynamic Dashboard Counter
-    const updateAdminCount = () => {
+    function updateAdminCount() {
         const countDisplay = document.getElementById('adminCount');
         const emptyRow = document.getElementById('emptyAdminRow');
         if (!countDisplay || !mdrrmoTableBody) return;
